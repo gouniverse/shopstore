@@ -3,14 +3,11 @@ package shopstore
 import (
 	"github.com/golang-module/carbon/v2"
 	"github.com/gouniverse/dataobject"
+	"github.com/gouniverse/maputils"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/uid"
 	"github.com/gouniverse/utils"
 )
-
-const ORDER_STATUS_PENDING = "pending"
-const ORDER_STATUS_PAID = "paid"
-const ORDER_STATUS_CANCELLED = "cancelled"
 
 // == CLASS ====================================================================
 
@@ -31,6 +28,8 @@ func NewOrder() *Order {
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetDeletedAt(sb.NULL_DATETIME)
 
+	o.SetMetas(map[string]string{})
+
 	return o
 }
 
@@ -42,20 +41,52 @@ func NewOrderFromExistingData(data map[string]string) *Order {
 
 // == METHODS ==================================================================
 
-// func (order *Order) Update() error {
-// 	return NewUserService().OrderUpdate(order)
-// }
-
-func (order *Order) IsPaid() bool {
-	return order.Get("status") == ORDER_STATUS_PAID
+func (order *Order) IsAwaitingFulfillment() bool {
+	return order.Status() == ORDER_STATUS_AWAITING_FULFILLMENT
 }
 
-func (order *Order) IsPending() bool {
-	return order.Get("status") == ORDER_STATUS_PENDING
+func (order *Order) IsAwaitingPayment() bool {
+	return order.Status() == ORDER_STATUS_AWAITING_PAYMENT
+}
+
+func (order *Order) IsAwaitingPickup() bool {
+	return order.Status() == ORDER_STATUS_AWAITING_PICKUP
+}
+
+func (order *Order) IsAwaitingShipment() bool {
+	return order.Status() == ORDER_STATUS_AWAITING_SHIPMENT
 }
 
 func (order *Order) IsCancelled() bool {
-	return order.Get("status") == ORDER_STATUS_CANCELLED
+	return order.Status() == ORDER_STATUS_CANCELLED
+}
+
+func (order *Order) IsCompleted() bool {
+	return order.Status() == ORDER_STATUS_COMPLETED
+}
+
+func (order *Order) IsDeclined() bool {
+	return order.Status() == ORDER_STATUS_DECLINED
+}
+
+func (order *Order) IsDisputed() bool {
+	return order.Status() == ORDER_STATUS_DISPUTED
+}
+
+func (order *Order) IsManualVerificationRequired() bool {
+	return order.Status() == ORDER_STATUS_MANUAL_VERIFICATION_REQUIRED
+}
+
+func (order *Order) IsPending() bool {
+	return order.Status() == ORDER_STATUS_PENDING
+}
+
+func (order *Order) IsRefunded() bool {
+	return order.Status() == ORDER_STATUS_REFUNDED
+}
+
+func (order *Order) IsShipped() bool {
+	return order.Status() == ORDER_STATUS_SHIPPED
 }
 
 // == GETTERS & SETTERS ========================================================
@@ -74,16 +105,7 @@ func (order *Order) DeletedAt() string {
 }
 
 func (order *Order) SetDeletedAt(deletedAt string) *Order {
-	order.Set("deleted_at", deletedAt)
-	return order
-}
-
-func (order *Order) ExamID() string {
-	return order.Get("exam_id")
-}
-
-func (order *Order) SetExamID(id string) *Order {
-	order.Set("exam_id", id)
+	order.Set(COLUMN_DELETED_AT, deletedAt)
 	return order
 }
 
@@ -103,6 +125,64 @@ func (order *Order) Memo() string {
 func (order *Order) SetMemo(memo string) *Order {
 	order.Set("memo", memo)
 	return order
+}
+
+func (order *Order) Metas() (map[string]string, error) {
+	metasStr := order.Get("metas")
+
+	if metasStr == "" {
+		metasStr = "{}"
+	}
+
+	metasJson, errJson := utils.FromJSON(metasStr, map[string]string{})
+	if errJson != nil {
+		return map[string]string{}, errJson
+	}
+
+	return maputils.MapStringAnyToMapStringString(metasJson.(map[string]any)), nil
+}
+
+func (order *Order) Meta(name string) string {
+	metas, err := order.Metas()
+
+	if err != nil {
+		return ""
+	}
+
+	if value, exists := metas[name]; exists {
+		return value
+	}
+
+	return ""
+}
+
+func (order *Order) SetMeta(name string, value string) error {
+	return order.UpsertMetas(map[string]string{name: value})
+}
+
+// SetMetas stores metas as json string
+// Warning: it overwrites any existing metas
+func (order *Order) SetMetas(metas map[string]string) error {
+	mapString, err := utils.ToJSON(metas)
+	if err != nil {
+		return err
+	}
+	order.Set("metas", mapString)
+	return nil
+}
+
+func (order *Order) UpsertMetas(metas map[string]string) error {
+	currentMetas, err := order.Metas()
+
+	if err != nil {
+		return err
+	}
+
+	for k, v := range metas {
+		currentMetas[k] = v
+	}
+
+	return order.SetMetas(currentMetas)
 }
 
 func (order *Order) Status() string {

@@ -8,51 +8,50 @@ func (store *Store) sqlOrderTableCreate() string {
 	sql := sb.NewBuilder(sb.DatabaseDriverName(store.db)).
 		Table(store.orderTableName).
 		Column(sb.Column{
-			Name:       "id",
+			Name:       COLUMN_ID,
 			Type:       sb.COLUMN_TYPE_STRING,
 			Length:     40,
 			PrimaryKey: true,
 		}).
 		Column(sb.Column{
-			Name:   "status",
+			Name:   COLUMN_STATUS,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 20,
 		}).
 		Column(sb.Column{
-			Name:   "user_id",
+			Name:   COLUMN_USER_ID,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 40,
 		}).
 		Column(sb.Column{
-			Name:   "exam_id",
-			Type:   sb.COLUMN_TYPE_STRING,
-			Length: 40,
-		}).
-		Column(sb.Column{
-			Name:   "quantity",
+			Name:   COLUMN_QUANTITY,
 			Type:   sb.COLUMN_TYPE_INTEGER,
 			Length: 10,
 		}).
 		Column(sb.Column{
-			Name:     "price",
+			Name:     COLUMN_PRICE,
 			Type:     sb.COLUMN_TYPE_DECIMAL,
 			Length:   10,
 			Decimals: 2,
 		}).
 		Column(sb.Column{
-			Name: "memo",
+			Name: COLUMN_METAS,
 			Type: sb.COLUMN_TYPE_TEXT,
 		}).
 		Column(sb.Column{
-			Name: "created_at",
+			Name: COLUMN_MEMO,
+			Type: sb.COLUMN_TYPE_TEXT,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_CREATED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: "updated_at",
+			Name: COLUMN_UPDATED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: "deleted_at",
+			Name: COLUMN_DELETED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		CreateIfNotExists()

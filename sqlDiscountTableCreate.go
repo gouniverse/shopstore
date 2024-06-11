@@ -7,13 +7,13 @@ func (st *Store) sqlDiscountTableCreate() string {
 	sql := sb.NewBuilder(st.dbDriverName).
 		Table(st.discountTableName).
 		Column(sb.Column{
-			Name:       "id",
+			Name:       COLUMN_ID,
 			Type:       sb.COLUMN_TYPE_STRING,
 			Length:     40,
 			PrimaryKey: true,
 		}).
 		Column(sb.Column{
-			Name:   "status",
+			Name:   COLUMN_STATUS,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 20,
 		}).
@@ -27,12 +27,12 @@ func (st *Store) sqlDiscountTableCreate() string {
 			Type: sb.COLUMN_TYPE_TEXT,
 		}).
 		Column(sb.Column{
-			Name:   "type",
+			Name:   COLUMN_TYPE,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 20,
 		}).
 		Column(sb.Column{
-			Name:     "amount",
+			Name:     COLUMN_AMOUNT,
 			Type:     sb.COLUMN_TYPE_DECIMAL,
 			Length:   10,
 			Decimals: 2,
@@ -43,23 +43,23 @@ func (st *Store) sqlDiscountTableCreate() string {
 			Length: 40,
 		}).
 		Column(sb.Column{
-			Name: "starts_at",
+			Name: COLUMN_STARTS_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: "ends_at",
+			Name: COLUMN_ENDS_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: "created_at",
+			Name: COLUMN_CREATED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: "updated_at",
+			Name: COLUMN_UPDATED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: "deleted_at",
+			Name: COLUMN_DELETED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		CreateIfNotExists()

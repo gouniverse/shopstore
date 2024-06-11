@@ -142,305 +142,6 @@ func TestStoreDiscountFindByID(t *testing.T) {
 	}
 }
 
-// func TestExamServiceExamSoftDelete(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-
-// 	exam := NewExam().
-// 		SetStatus(EXAM_STATUS_DRAFT).
-// 		SetTitle("EXAM01_ID").
-// 		SetPrice("19.99").
-// 		SetQuestionsNumber("30").
-// 		SetMinutesToComplete("60")
-
-// 	err := NewExamService().ExamCreate(exam)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	err = NewExamService().ExamSoftDeleteByID(exam.ID())
-
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	if exam.DeletedAt() != sb.NULL_DATETIME {
-// 		t.Fatal("Exam MUST NOT be soft deleted")
-// 	}
-
-// 	examFound, errFind := NewExamService().ExamFindByID(exam.ID())
-
-// 	if errFind != nil {
-// 		t.Fatal("unexpected error:", errFind)
-// 	}
-
-// 	if examFound != nil {
-// 		t.Fatal("Exam MUST be nil")
-// 	}
-
-// 	examFindWithDeleted, err := NewExamService().ExamList(ExamQueryOptions{
-// 		ID:          exam.ID(),
-// 		Limit:       1,
-// 		WithDeleted: true,
-// 	})
-
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	if len(examFindWithDeleted) == 0 {
-// 		t.Fatal("Exam MUST be soft deleted")
-// 	}
-
-// 	if strings.Contains(examFindWithDeleted[0].DeletedAt(), sb.NULL_DATETIME) {
-// 		t.Fatal("Exam MUST be soft deleted", examFound.DeletedAt())
-// 	}
-
-// }
-
-// func TestExamServiceQuestionCreate(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-// 	question := NewExamQuestion().
-// 		SetStatus(EXAM_QUESTION_STATUS_DRAFT).
-// 		SetType(EXAM_QUESTION_TYPE_CHOICE_SINGLE).
-// 		SetTitle("QUESTION_TITLE")
-
-// 	err := NewExamService().QuestionCreate(question)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-// }
-
-// func TestExamServiceQuestionFindByID(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-
-// 	question := NewExamQuestion().
-// 		SetExamID("EXAM01").
-// 		SetStatus(EXAM_QUESTION_STATUS_DRAFT).
-// 		SetType(EXAM_QUESTION_TYPE_CHOICE_SINGLE).
-// 		SetTitle("QUESTION_TITLE").
-// 		SetDetails("QUESTION_DETAILS").
-// 		SetMemo("test memo")
-
-// 	err := NewExamService().QuestionCreate(question)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	questionFound, errFind := NewExamService().QuestionFindByID(question.ID())
-
-// 	if errFind != nil {
-// 		t.Fatal("unexpected error:", errFind)
-// 	}
-
-// 	if questionFound == nil {
-// 		t.Fatal("Exam MUST NOT be nil")
-// 	}
-
-// 	if questionFound.ExamID() != "EXAM01" {
-// 		t.Fatal("Question exam_id MUST BE 'EXAM01', found: ", questionFound.ExamID())
-// 	}
-
-// 	if questionFound.Title() != "QUESTION_TITLE" {
-// 		t.Fatal("Question title MUST BE 'QUESTION_TITLE', found: ", questionFound.Title())
-// 	}
-
-// 	if questionFound.Status() != EXAM_QUESTION_STATUS_DRAFT {
-// 		t.Fatal("Question status MUST BE 'draft', found: ", questionFound.Status())
-// 	}
-
-// 	if questionFound.Details() != "QUESTION_DETAILS" {
-// 		t.Fatal("Question details MUST BE 'QUESTION_DETAILS', found: ", questionFound.Details())
-// 	}
-
-// 	if questionFound.Type() != EXAM_QUESTION_TYPE_CHOICE_SINGLE {
-// 		t.Fatal("Question type MUST BE 'choice_single', found: ", questionFound.Type())
-// 	}
-
-// 	if questionFound.Memo() != "test memo" {
-// 		t.Fatal("Exam memo MUST BE 'test memo', found: ", questionFound.Memo())
-// 	}
-
-// 	if !strings.Contains(questionFound.DeletedAt(), sb.NULL_DATETIME) {
-// 		t.Fatal("Question MUST NOT be soft deleted", questionFound.DeletedAt())
-// 	}
-// }
-
-// func TestExamServiceQuestionSoftDelete(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-
-// 	question := NewExamQuestion().
-// 		SetStatus(EXAM_QUESTION_STATUS_DRAFT).
-// 		SetType(EXAM_QUESTION_TYPE_CHOICE_SINGLE).
-// 		SetTitle("QUESTION_TITLE")
-
-// 	err := NewExamService().QuestionCreate(question)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	err = NewExamService().QuestionSoftDeleteByID(question.ID())
-
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	if question.DeletedAt() != sb.NULL_DATETIME {
-// 		t.Fatal("Question MUST NOT be soft deleted")
-// 	}
-
-// 	questionFound, errFind := NewExamService().QuestionFindByID(question.ID())
-
-// 	if errFind != nil {
-// 		t.Fatal("unexpected error:", errFind)
-// 	}
-
-// 	if questionFound != nil {
-// 		t.Fatal("Question MUST be nil")
-// 	}
-
-// 	questionFindWithDeleted, err := NewExamService().QuestionList(ExamQuestionQueryOptions{
-// 		ID:          question.ID(),
-// 		Limit:       1,
-// 		WithDeleted: true,
-// 	})
-
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	if len(questionFindWithDeleted) == 0 {
-// 		t.Fatal("Exam MUST be soft deleted")
-// 	}
-
-// 	if strings.Contains(questionFindWithDeleted[0].DeletedAt(), sb.NULL_DATETIME) {
-// 		t.Fatal("Question MUST be soft deleted", questionFound.DeletedAt())
-// 	}
-
-// }
-
-// func TestExamServiceOptionCreate(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-// 	option := NewExamQuestionOption().
-// 		SetStatus(EXAM_QUESTION_OPTION_STATUS_DRAFT).
-// 		SetTitle("OPTION_TITLE")
-
-// 	err := NewExamService().OptionCreate(option)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-// }
-
-// func TestExamServiceOptionFindByID(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-
-// 	option := NewExamQuestionOption().
-// 		SetStatus(EXAM_QUESTION_OPTION_STATUS_DRAFT).
-// 		SetQuestionID("QUESTION01").
-// 		SetTitle("OPTION_TITLE").
-// 		SetDetails("OPTION_DETAILS").
-// 		SetMemo("test memo")
-
-// 	err := NewExamService().OptionCreate(option)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	optionFound, errFind := NewExamService().OptionFindByID(option.ID())
-
-// 	if errFind != nil {
-// 		t.Fatal("unexpected error:", errFind)
-// 	}
-
-// 	if optionFound == nil {
-// 		t.Fatal("Option MUST NOT be nil")
-// 	}
-
-// 	if optionFound.QuestionID() != "QUESTION01" {
-// 		t.Fatal("Option question_id MUST BE 'QUESTION01', found: ", optionFound.QuestionID())
-// 	}
-
-// 	if optionFound.Title() != "OPTION_TITLE" {
-// 		t.Fatal("Option title MUST BE 'OPTION_TITLE', found: ", optionFound.Title())
-// 	}
-
-// 	if optionFound.Status() != EXAM_STATUS_DRAFT {
-// 		t.Fatal("Option status MUST BE 'draft', found: ", optionFound.Status())
-// 	}
-
-// 	if optionFound.Details() != "OPTION_DETAILS" {
-// 		t.Fatal("Option details MUST BE 'OPTION_DETAILS', found: ", optionFound.Details())
-// 	}
-
-// 	if optionFound.Memo() != "test memo" {
-// 		t.Fatal("Exam memo MUST BE 'test memo', found: ", optionFound.Memo())
-// 	}
-
-// 	if !strings.Contains(optionFound.DeletedAt(), sb.NULL_DATETIME) {
-// 		t.Fatal("Option MUST NOT be soft deleted", optionFound.DeletedAt())
-// 	}
-// }
-
-// func TestExamServiceOptionSoftDelete(t *testing.T) {
-// 	config.TestsConfigureAndInitialize()
-// 	Initialize()
-
-// 	option := NewExamQuestionOption().
-// 		SetStatus(EXAM_QUESTION_OPTION_STATUS_DRAFT).
-// 		SetTitle("OPTION_TITLE").
-// 		SetDetails("OPTION_DETAILS").
-// 		SetMemo("test memo")
-
-// 	err := NewExamService().OptionCreate(option)
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	err = NewExamService().OptionSoftDeleteByID(option.ID())
-
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	if option.DeletedAt() != sb.NULL_DATETIME {
-// 		t.Fatal("Exam MUST NOT be soft deleted")
-// 	}
-
-// 	optionFound, errFind := NewExamService().OptionFindByID(option.ID())
-
-// 	if errFind != nil {
-// 		t.Fatal("unexpected error:", errFind)
-// 	}
-
-// 	if optionFound != nil {
-// 		t.Fatal("Exam MUST be nil")
-// 	}
-
-// 	optionFindWithDeleted, err := NewExamService().OptionList(ExamQuestionOptionQueryOptions{
-// 		ID:          option.ID(),
-// 		Limit:       1,
-// 		WithDeleted: true,
-// 	})
-
-// 	if err != nil {
-// 		t.Fatal("unexpected error:", err)
-// 	}
-
-// 	if len(optionFindWithDeleted) == 0 {
-// 		t.Fatal("Exam MUST be soft deleted")
-// 	}
-
-// 	if strings.Contains(optionFindWithDeleted[0].DeletedAt(), sb.NULL_DATETIME) {
-// 		t.Fatal("Exam MUST be soft deleted", optionFound.DeletedAt())
-// 	}
-
-// }
-
 func TestStoreOderCreate(t *testing.T) {
 	db := initDB(":memory:")
 
@@ -461,10 +162,14 @@ func TestStoreOderCreate(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER)1_ID").
-		SetExamID("EXAM01_ID").
+		SetUserID("USER01_ID").
 		SetQuantity(1).
 		SetPrice(19.99)
+
+	order.SetMetas(map[string]string{
+		"color": "green",
+		"size":  "xxl",
+	})
 
 	err = store.OrderCreate(order)
 	if err != nil {
@@ -493,10 +198,14 @@ func TestStoreOrderFindByID(t *testing.T) {
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
 		SetUserID("USER01_ID").
-		SetExamID("EXAM01_ID").
 		SetQuantity(1).
 		SetPrice(19.99).
 		SetMemo("test memo")
+
+	order.SetMetas(map[string]string{
+		"color": "green",
+		"size":  "xxl",
+	})
 
 	err = store.OrderCreate(order)
 	if err != nil {
@@ -517,10 +226,6 @@ func TestStoreOrderFindByID(t *testing.T) {
 		t.Fatal("Order user id MUST BE 'USER01_ID', found: ", orderFound.UserID())
 	}
 
-	if orderFound.ExamID() != "EXAM01_ID" {
-		t.Fatal("Order exam id MUST BE 'EXAM01_ID', found: ", orderFound.ExamID())
-	}
-
 	if orderFound.Status() != ORDER_STATUS_PENDING {
 		t.Fatal("Order status MUST BE 'pending', found: ", orderFound.Status())
 	}
@@ -535,6 +240,14 @@ func TestStoreOrderFindByID(t *testing.T) {
 
 	if orderFound.Memo() != "test memo" {
 		t.Fatal("Order memo MUST BE 'test memo', found: ", orderFound.Memo())
+	}
+
+	if orderFound.Meta("color") != "green" {
+		t.Fatal("Order color meta MUST BE 'green', found: ", orderFound.Meta("color"))
+	}
+
+	if orderFound.Meta("size") != "xxl" {
+		t.Fatal("Order size meta MUST BE 'xxl', found: ", orderFound.Meta("xxl"))
 	}
 
 	if !strings.Contains(orderFound.DeletedAt(), sb.NULL_DATETIME) {
@@ -563,7 +276,6 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
 		SetUserID("USER01_ID").
-		SetExamID("EXAM01_ID").
 		SetQuantity(1).
 		SetPrice(19.99)
 

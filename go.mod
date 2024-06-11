@@ -8,6 +8,7 @@ require (
 	github.com/doug-martin/goqu/v9 v9.19.0
 	github.com/golang-module/carbon/v2 v2.3.12
 	github.com/gouniverse/dataobject v0.3.0
+	github.com/gouniverse/maputils v0.7.0
 	github.com/gouniverse/sb v0.4.0
 	github.com/gouniverse/uid v1.5.0
 	github.com/gouniverse/utils v1.39.1
@@ -24,7 +25,6 @@ require (
 	github.com/gouniverse/api v1.5.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
 	github.com/gouniverse/envenc v0.3.0 // indirect
-	github.com/gouniverse/maputils v0.7.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
