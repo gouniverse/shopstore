@@ -6,6 +6,26 @@
 
 
 ## Installation
-```
+
+```ssh
 go get -u github.com/gouniverse/shopstore
+```
+
+## Usage
+
+```golang
+ShopStore, err := shopstore.NewStore(shopstore.NewStoreOptions{
+  DB:                 Database.DB(),
+  DiscountTableName:  "shop_discount",
+  OrderTableName:     "shop_order",
+  AutomigrateEnabled: true,
+})
+
+if err != nil {
+  panic(err)
+}
+
+if ShopStore == nil {
+  panic("ShopStore is nil")
+}
 ```
