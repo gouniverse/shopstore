@@ -92,16 +92,24 @@ func (order *Order) IsShipped() bool {
 // == GETTERS & SETTERS ========================================================
 
 func (order *Order) CreatedAt() string {
-	return order.Get("created_at")
+	return order.Get(COLUMN_CREATED_AT)
+}
+
+func (order *Order) CreatedAtCarbon() carbon.Carbon {
+	return carbon.NewCarbon().Parse(order.CreatedAt(), carbon.UTC)
 }
 
 func (order *Order) SetCreatedAt(createdAt string) *Order {
-	order.Set("created_at", createdAt)
+	order.Set(COLUMN_CREATED_AT, createdAt)
 	return order
 }
 
 func (order *Order) DeletedAt() string {
-	return order.Get("deleted_at")
+	return order.Get(COLUMN_DELETED_AT)
+}
+
+func (order *Order) DeletedAtCarbon() carbon.Carbon {
+	return carbon.NewCarbon().Parse(order.DeletedAt(), carbon.UTC)
 }
 
 func (order *Order) SetDeletedAt(deletedAt string) *Order {
@@ -110,25 +118,25 @@ func (order *Order) SetDeletedAt(deletedAt string) *Order {
 }
 
 func (order *Order) ID() string {
-	return order.Get("id")
+	return order.Get(COLUMN_ID)
 }
 
 func (order *Order) SetID(id string) *Order {
-	order.Set("id", id)
+	order.Set(COLUMN_ID, id)
 	return order
 }
 
 func (order *Order) Memo() string {
-	return order.Get("memo")
+	return order.Get(COLUMN_MEMO)
 }
 
 func (order *Order) SetMemo(memo string) *Order {
-	order.Set("memo", memo)
+	order.Set(COLUMN_MEMO, memo)
 	return order
 }
 
 func (order *Order) Metas() (map[string]string, error) {
-	metasStr := order.Get("metas")
+	metasStr := order.Get(COLUMN_METAS)
 
 	if metasStr == "" {
 		metasStr = "{}"
@@ -167,7 +175,7 @@ func (order *Order) SetMetas(metas map[string]string) error {
 	if err != nil {
 		return err
 	}
-	order.Set("metas", mapString)
+	order.Set(COLUMN_METAS, mapString)
 	return nil
 }
 
@@ -186,56 +194,60 @@ func (order *Order) UpsertMetas(metas map[string]string) error {
 }
 
 func (order *Order) Status() string {
-	return order.Get("status")
+	return order.Get(COLUMN_STATUS)
 }
 
 func (order *Order) SetStatus(status string) *Order {
-	order.Set("status", status)
+	order.Set(COLUMN_STATUS, status)
 	return order
 }
 
 func (order *Order) Price() string {
-	return order.Get("price")
+	return order.Get(COLUMN_PRICE)
 }
 
 func (order *Order) PriceFloat() float64 {
-	price, _ := utils.ToFloat(order.Get("price"))
+	price, _ := utils.ToFloat(order.Get(COLUMN_PRICE))
 	return price
 }
 
 func (order *Order) SetPrice(price float64) *Order {
-	order.Set("price", utils.ToString(price))
+	order.Set(COLUMN_PRICE, utils.ToString(price))
 	return order
 }
 
 func (order *Order) Quantity() string {
-	return order.Get("quantity")
+	return order.Get(COLUMN_QUANTITY)
 }
 
 func (order *Order) QuantityInt() int64 {
-	quantity, _ := utils.ToInt(order.Get("quantity"))
+	quantity, _ := utils.ToInt(order.Quantity())
 	return quantity
 }
 
 func (order *Order) SetQuantity(quantity int) *Order {
-	order.Set("quantity", utils.ToString(quantity))
+	order.Set(COLUMN_QUANTITY, utils.ToString(quantity))
 	return order
 }
 
 func (order *Order) UpdatedAt() string {
-	return order.Get("updated_at")
+	return order.Get(COLUMN_UPDATED_AT)
+}
+
+func (order *Order) UpdatedAtCarbon() carbon.Carbon {
+	return carbon.NewCarbon().Parse(order.UpdatedAt(), carbon.UTC)
 }
 
 func (order *Order) SetUpdatedAt(updatedAt string) *Order {
-	order.Set("updated_at", updatedAt)
+	order.Set(COLUMN_UPDATED_AT, updatedAt)
 	return order
 }
 
 func (order *Order) UserID() string {
-	return order.Get("user_id")
+	return order.Get(COLUMN_USER_ID)
 }
 
 func (order *Order) SetUserID(id string) *Order {
-	order.Set("user_id", id)
+	order.Set(COLUMN_USER_ID, id)
 	return order
 }

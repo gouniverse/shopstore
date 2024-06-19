@@ -18,12 +18,12 @@ func (st *Store) sqlDiscountTableCreate() string {
 			Length: 20,
 		}).
 		Column(sb.Column{
-			Name:   "title",
+			Name:   COLUMN_TITLE,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 255,
 		}).
 		Column(sb.Column{
-			Name: "description",
+			Name: COLUMN_DESCRIPTION,
 			Type: sb.COLUMN_TYPE_TEXT,
 		}).
 		Column(sb.Column{
@@ -38,7 +38,7 @@ func (st *Store) sqlDiscountTableCreate() string {
 			Decimals: 2,
 		}).
 		Column(sb.Column{
-			Name:   "code",
+			Name:   COLUMN_CODE,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 40,
 		}).

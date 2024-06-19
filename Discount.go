@@ -60,7 +60,7 @@ func NewDiscountFromExistingData(data map[string]string) *Discount {
 // == SETTERS AND GETTERS ====================================================
 
 func (d *Discount) Amount() float64 {
-	amountStr := d.Get("amount")
+	amountStr := d.Get(COLUMN_AMOUNT)
 	amount, err := utils.ToFloat(amountStr)
 
 	if err != nil {
@@ -72,21 +72,21 @@ func (d *Discount) Amount() float64 {
 
 func (d *Discount) SetAmount(amount float64) *Discount {
 	amountStr := utils.ToString(amount)
-	d.Set("amount", amountStr)
+	d.Set(COLUMN_AMOUNT, amountStr)
 	return d
 }
 
 func (d *Discount) Code() string {
-	return d.Get("code")
+	return d.Get(COLUMN_CODE)
 }
 
 func (d *Discount) SetCode(code string) *Discount {
-	d.Set("code", code)
+	d.Set(COLUMN_CODE, code)
 	return d
 }
 
 func (d *Discount) CreatedAt() string {
-	return d.Get("created_at")
+	return d.Get(COLUMN_CREATED_AT)
 }
 
 func (d *Discount) CreatedAtCarbon() carbon.Carbon {
@@ -95,30 +95,30 @@ func (d *Discount) CreatedAtCarbon() carbon.Carbon {
 }
 
 func (d *Discount) SetCreatedAt(createdAt string) *Discount {
-	d.Set("created_at", createdAt)
+	d.Set(COLUMN_CREATED_AT, createdAt)
 	return d
 }
 
 func (d *Discount) DeletedAt() string {
-	return d.Get("deleted_at")
+	return d.Get(COLUMN_DELETED_AT)
 }
 
 func (d *Discount) SetDeletedAt(deletedAt string) *Discount {
-	d.Set("deleted_at", deletedAt)
+	d.Set(COLUMN_DELETED_AT, deletedAt)
 	return d
 }
 
 func (d *Discount) Description() string {
-	return d.Get("description")
+	return d.Get(COLUMN_DESCRIPTION)
 }
 
 func (d *Discount) SetDescription(description string) *Discount {
-	d.Set("description", description)
+	d.Set(COLUMN_DESCRIPTION, description)
 	return d
 }
 
 func (d *Discount) EndsAt() string {
-	return d.Get("ends_at")
+	return d.Get(COLUMN_ENDS_AT)
 }
 
 func (d *Discount) EndsAtCarbon() carbon.Carbon {
@@ -127,23 +127,23 @@ func (d *Discount) EndsAtCarbon() carbon.Carbon {
 }
 
 func (d *Discount) SetEndsAt(endsAt string) *Discount {
-	d.Set("ends_at", endsAt)
+	d.Set(COLUMN_ENDS_AT, endsAt)
 	return d
 }
 
 // ID returns the ID of the exam
 func (o *Discount) ID() string {
-	return o.Get("id")
+	return o.Get(COLUMN_ID)
 }
 
 // SetID sets the ID of the exam
 func (o *Discount) SetID(id string) *Discount {
-	o.Set("id", id)
+	o.Set(COLUMN_ID, id)
 	return o
 }
 
 func (d *Discount) StartsAt() string {
-	return d.Get("starts_at")
+	return d.Get(COLUMN_STARTS_AT)
 }
 
 func (d *Discount) StartsAtCarbon() carbon.Carbon {
@@ -152,39 +152,39 @@ func (d *Discount) StartsAtCarbon() carbon.Carbon {
 }
 
 func (d *Discount) SetStartsAt(startsAt string) *Discount {
-	d.Set("starts_at", startsAt)
+	d.Set(COLUMN_STARTS_AT, startsAt)
 	return d
 }
 
 func (d *Discount) Status() string {
-	return d.Get("status")
+	return d.Get(COLUMN_STATUS)
 }
 
 func (d *Discount) SetStatus(status string) *Discount {
-	d.Set("status", status)
+	d.Set(COLUMN_STATUS, status)
 	return d
 }
 
 func (d *Discount) Title() string {
-	return d.Get("title")
+	return d.Get(COLUMN_TITLE)
 }
 
 func (d *Discount) SetTitle(title string) *Discount {
-	d.Set("title", title)
+	d.Set(COLUMN_TITLE, title)
 	return d
 }
 
 func (d *Discount) Type() string {
-	return d.Get("type")
+	return d.Get(COLUMN_TYPE)
 }
 
 func (d *Discount) SetType(type_ string) *Discount {
-	d.Set("type", type_)
+	d.Set(COLUMN_TYPE, type_)
 	return d
 }
 
 func (d *Discount) UpdatedAt() string {
-	return d.Get("updated_at")
+	return d.Get(COLUMN_UPDATED_AT)
 }
 
 func (d *Discount) UpdatedAtCarbon() carbon.Carbon {
@@ -193,6 +193,6 @@ func (d *Discount) UpdatedAtCarbon() carbon.Carbon {
 }
 
 func (d *Discount) SetUpdatedAt(updatedAt string) *Discount {
-	d.Set("updated_at", updatedAt)
+	d.Set(COLUMN_UPDATED_AT, updatedAt)
 	return d
 }
