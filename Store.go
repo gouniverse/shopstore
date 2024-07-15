@@ -20,6 +20,7 @@ var _ StoreInterface = (*Store)(nil) // verify it extends the interface
 type Store struct {
 	discountTableName  string
 	orderTableName     string
+	productTableName   string
 	db                 *sql.DB
 	dbDriverName       string
 	timeoutSeconds     int64
@@ -38,6 +39,15 @@ func (store *Store) AutoMigrate() error {
 	}
 
 	sql = store.sqlOrderTableCreate()
+
+	_, err = store.db.Exec(sql)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	sql = store.sqlProductTableCreate()
 
 	_, err = store.db.Exec(sql)
 
@@ -489,6 +499,194 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 	return q
 }
 
+func (store *Store) ProductCreate(product *Product) error {
+	product.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	product.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	product.SetDeletedAt(sb.NULL_DATETIME)
+
+	data := product.Data()
+
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Insert(store.productTableName).
+		Prepared(true).
+		Rows(data).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	if err != nil {
+		return err
+	}
+
+	product.MarkAsNotDirty()
+
+	return nil
+}
+
+func (store *Store) ProductSoftDelete(product *Product) error {
+	if product == nil {
+		return errors.New("product is empty")
+	}
+
+	product.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+
+	return store.ProductUpdate(product)
+}
+
+func (store *Store) ProductSoftDeleteByID(id string) error {
+	product, err := store.ProductFindByID(id)
+
+	if err != nil {
+		return err
+	}
+
+	return store.ProductSoftDelete(product)
+}
+
+func (store *Store) ProductFindByID(id string) (*Product, error) {
+	if id == "" {
+		return nil, errors.New("product id is empty")
+	}
+
+	list, err := store.ProductList(ProductQueryOptions{
+		ID:    id,
+		Limit: 1,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(list) > 0 {
+		return &list[0], nil
+	}
+
+	return nil, nil
+}
+
+func (store *Store) ProductList(options ProductQueryOptions) ([]Product, error) {
+	q := store.productQuery(options)
+
+	sqlStr, _, errSql := q.Select().ToSQL()
+
+	if errSql != nil {
+		return []Product{}, nil
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	db := sb.NewDatabase(store.db, store.dbDriverName)
+	modelMaps, err := db.SelectToMapString(sqlStr)
+	if err != nil {
+		return []Product{}, err
+	}
+
+	list := []Product{}
+
+	lo.ForEach(modelMaps, func(modelMap map[string]string, index int) {
+		model := NewProductFromExistingData(modelMap)
+		list = append(list, *model)
+	})
+
+	return list, nil
+}
+
+func (store *Store) ProductUpdate(product *Product) error {
+	if product == nil {
+		return errors.New("product is nil")
+	}
+
+	product.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString())
+
+	dataChanged := product.DataChanged()
+
+	delete(dataChanged, "id") // ID is not updateable
+
+	if len(dataChanged) < 1 {
+		return nil
+	}
+
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Update(store.productTableName).
+		Prepared(true).
+		Set(dataChanged).
+		Where(goqu.C("id").Eq(product.ID())).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	product.MarkAsNotDirty()
+
+	return err
+}
+
+func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDataset {
+	q := goqu.Dialect(store.dbDriverName).From(store.productTableName)
+
+	if options.ID != "" {
+		q = q.Where(goqu.C("id").Eq(options.ID))
+	}
+
+	if options.Title != "" {
+		q = q.Where(goqu.C("user_id").Eq(options.Title))
+	}
+
+	if options.Status != "" {
+		q = q.Where(goqu.C("status").Eq(options.Status))
+	}
+
+	if len(options.StatusIn) > 0 {
+		q = q.Where(goqu.C("status").In(options.StatusIn))
+	}
+
+	if !options.CountOnly {
+		if options.Limit > 0 {
+			q = q.Limit(uint(options.Limit))
+		}
+
+		if options.Offset > 0 {
+			q = q.Offset(uint(options.Offset))
+		}
+	}
+
+	sortOrder := "desc"
+	if options.SortOrder != "" {
+		sortOrder = options.SortOrder
+	}
+
+	if options.OrderBy != "" {
+		if strings.EqualFold(sortOrder, sb.ASC) {
+			q = q.Order(goqu.I(options.OrderBy).Asc())
+		} else {
+			q = q.Order(goqu.I(options.OrderBy).Desc())
+		}
+	}
+
+	if !options.WithDeleted {
+		q = q.Where(goqu.C("deleted_at").Eq(sb.NULL_DATETIME))
+	}
+
+	return q
+}
+
 type DiscountQueryOptions struct {
 	ID          string
 	IDIn        []string
@@ -510,6 +708,20 @@ type OrderQueryOptions struct {
 	ExamID      string
 	Status      string
 	StatusIn    []string
+	Offset      int
+	Limit       int
+	SortOrder   string
+	OrderBy     string
+	CountOnly   bool
+	WithDeleted bool
+}
+
+type ProductQueryOptions struct {
+	ID          string
+	IDIn        string
+	Status      string
+	StatusIn    []string
+	Title       string
 	Offset      int
 	Limit       int
 	SortOrder   string

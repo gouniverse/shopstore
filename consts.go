@@ -60,3 +60,9 @@ const ORDER_STATUS_REFUNDED = "refunded"
 
 // Order has been shipped, but receipt has not been confirmed; seller has used the Ship Items action. A listing of all orders with a "Shipped" status can be found under the More tab of the View Orders screen.
 const ORDER_STATUS_SHIPPED = "shipped"
+
+const PRODUCT_STATUS_DRAFT = "draft"
+
+const PRODUCT_STATUS_ACTIVE = "active"
+
+const PRODUCT_STATUS_DISABLED = "disabled"

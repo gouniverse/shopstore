@@ -11,6 +11,7 @@ import (
 type NewStoreOptions struct {
 	DiscountTableName  string
 	OrderTableName     string
+	ProductTableName   string
 	DB                 *sql.DB
 	DbDriverName       string
 	AutomigrateEnabled bool
@@ -27,6 +28,10 @@ func NewStore(opts NewStoreOptions) (*Store, error) {
 		return nil, errors.New("shop store: OrderTableName is required")
 	}
 
+	if opts.ProductTableName == "" {
+		return nil, errors.New("shop store: ProductTableName is required")
+	}
+
 	if opts.DB == nil {
 		return nil, errors.New("shop store: DB is required")
 	}
@@ -38,6 +43,7 @@ func NewStore(opts NewStoreOptions) (*Store, error) {
 	store := &Store{
 		discountTableName:  opts.DiscountTableName,
 		orderTableName:     opts.OrderTableName,
+		productTableName:   opts.ProductTableName,
 		automigrateEnabled: opts.AutomigrateEnabled,
 		db:                 opts.DB,
 		dbDriverName:       opts.DbDriverName,
