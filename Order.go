@@ -15,9 +15,11 @@ type Order struct {
 	dataobject.DataObject
 }
 
+var _ OrderInterface = (*Order)(nil)
+
 // == CONSTRUCTORS =============================================================
 
-func NewOrder() *Order {
+func NewOrder() OrderInterface {
 	o := (&Order{}).
 		SetID(uid.HumanUid()).
 		SetStatus(ORDER_STATUS_PENDING).
@@ -99,7 +101,7 @@ func (order *Order) CreatedAtCarbon() carbon.Carbon {
 	return carbon.NewCarbon().Parse(order.CreatedAt(), carbon.UTC)
 }
 
-func (order *Order) SetCreatedAt(createdAt string) *Order {
+func (order *Order) SetCreatedAt(createdAt string) OrderInterface {
 	order.Set(COLUMN_CREATED_AT, createdAt)
 	return order
 }
@@ -112,7 +114,7 @@ func (order *Order) DeletedAtCarbon() carbon.Carbon {
 	return carbon.NewCarbon().Parse(order.DeletedAt(), carbon.UTC)
 }
 
-func (order *Order) SetDeletedAt(deletedAt string) *Order {
+func (order *Order) SetDeletedAt(deletedAt string) OrderInterface {
 	order.Set(COLUMN_DELETED_AT, deletedAt)
 	return order
 }
@@ -121,7 +123,7 @@ func (order *Order) ID() string {
 	return order.Get(COLUMN_ID)
 }
 
-func (order *Order) SetID(id string) *Order {
+func (order *Order) SetID(id string) OrderInterface {
 	order.Set(COLUMN_ID, id)
 	return order
 }
@@ -130,7 +132,7 @@ func (order *Order) Memo() string {
 	return order.Get(COLUMN_MEMO)
 }
 
-func (order *Order) SetMemo(memo string) *Order {
+func (order *Order) SetMemo(memo string) OrderInterface {
 	order.Set(COLUMN_MEMO, memo)
 	return order
 }
@@ -197,7 +199,7 @@ func (order *Order) Status() string {
 	return order.Get(COLUMN_STATUS)
 }
 
-func (order *Order) SetStatus(status string) *Order {
+func (order *Order) SetStatus(status string) OrderInterface {
 	order.Set(COLUMN_STATUS, status)
 	return order
 }
@@ -211,7 +213,7 @@ func (order *Order) PriceFloat() float64 {
 	return price
 }
 
-func (order *Order) SetPrice(price float64) *Order {
+func (order *Order) SetPrice(price float64) OrderInterface {
 	order.Set(COLUMN_PRICE, utils.ToString(price))
 	return order
 }
@@ -225,7 +227,7 @@ func (order *Order) QuantityInt() int64 {
 	return quantity
 }
 
-func (order *Order) SetQuantity(quantity int) *Order {
+func (order *Order) SetQuantity(quantity int) OrderInterface {
 	order.Set(COLUMN_QUANTITY, utils.ToString(quantity))
 	return order
 }
@@ -238,7 +240,7 @@ func (order *Order) UpdatedAtCarbon() carbon.Carbon {
 	return carbon.NewCarbon().Parse(order.UpdatedAt(), carbon.UTC)
 }
 
-func (order *Order) SetUpdatedAt(updatedAt string) *Order {
+func (order *Order) SetUpdatedAt(updatedAt string) OrderInterface {
 	order.Set(COLUMN_UPDATED_AT, updatedAt)
 	return order
 }
@@ -247,7 +249,7 @@ func (order *Order) UserID() string {
 	return order.Get(COLUMN_USER_ID)
 }
 
-func (order *Order) SetUserID(id string) *Order {
+func (order *Order) SetUserID(id string) OrderInterface {
 	order.Set(COLUMN_USER_ID, id)
 	return order
 }

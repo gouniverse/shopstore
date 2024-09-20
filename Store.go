@@ -307,7 +307,7 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 	return q
 }
 
-func (store *Store) OrderCreate(order *Order) error {
+func (store *Store) OrderCreate(order OrderInterface) error {
 	order.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	order.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	order.SetDeletedAt(sb.NULL_DATETIME)
@@ -339,7 +339,7 @@ func (store *Store) OrderCreate(order *Order) error {
 	return nil
 }
 
-func (store *Store) OrderSoftDelete(order *Order) error {
+func (store *Store) OrderSoftDelete(order OrderInterface) error {
 	if order == nil {
 		return errors.New("order is empty")
 	}
@@ -359,7 +359,7 @@ func (store *Store) OrderSoftDeleteByID(id string) error {
 	return store.OrderSoftDelete(order)
 }
 
-func (store *Store) OrderFindByID(id string) (*Order, error) {
+func (store *Store) OrderFindByID(id string) (OrderInterface, error) {
 	if id == "" {
 		return nil, errors.New("order id is empty")
 	}
@@ -374,19 +374,19 @@ func (store *Store) OrderFindByID(id string) (*Order, error) {
 	}
 
 	if len(list) > 0 {
-		return &list[0], nil
+		return list[0], nil
 	}
 
 	return nil, nil
 }
 
-func (store *Store) OrderList(options OrderQueryOptions) ([]Order, error) {
+func (store *Store) OrderList(options OrderQueryOptions) ([]OrderInterface, error) {
 	q := store.orderQuery(options)
 
 	sqlStr, _, errSql := q.Select().ToSQL()
 
 	if errSql != nil {
-		return []Order{}, nil
+		return []OrderInterface{}, nil
 	}
 
 	if store.debugEnabled {
@@ -396,20 +396,20 @@ func (store *Store) OrderList(options OrderQueryOptions) ([]Order, error) {
 	db := sb.NewDatabase(store.db, store.dbDriverName)
 	modelMaps, err := db.SelectToMapString(sqlStr)
 	if err != nil {
-		return []Order{}, err
+		return []OrderInterface{}, err
 	}
 
-	list := []Order{}
+	list := []OrderInterface{}
 
 	lo.ForEach(modelMaps, func(modelMap map[string]string, index int) {
 		model := NewOrderFromExistingData(modelMap)
-		list = append(list, *model)
+		list = append(list, model)
 	})
 
 	return list, nil
 }
 
-func (store *Store) OrderUpdate(order *Order) error {
+func (store *Store) OrderUpdate(order OrderInterface) error {
 	if order == nil {
 		return errors.New("order is nil")
 	}
