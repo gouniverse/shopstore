@@ -44,6 +44,7 @@ type OrderInterface interface {
 	SetMetas(metas map[string]string) error
 
 	Price() string
+	PriceFloat() float64
 	SetPrice(price float64) OrderInterface
 
 	Quantity() string
