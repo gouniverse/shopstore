@@ -19,7 +19,7 @@ func (store *Store) sqlOrderTableCreate() string {
 			Length: 20,
 		}).
 		Column(sb.Column{
-			Name:   COLUMN_USER_ID,
+			Name:   COLUMN_CUSTOMER_ID,
 			Type:   sb.COLUMN_TYPE_STRING,
 			Length: 40,
 		}).

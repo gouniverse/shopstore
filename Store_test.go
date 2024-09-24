@@ -360,11 +360,11 @@ func TestStoreDiscountUpdate(t *testing.T) {
 	}
 
 	if discountFound == nil {
-		t.Fatal("Exam MUST NOT be nil")
+		t.Fatal("Discount MUST NOT be nil")
 	}
 
 	if discountFound.Title() != "DISCOUNT_TITLE_UPDATED" {
-		t.Fatal("Exam title MUST BE 'DISCOUNT_TITLE_UPDATED', found: ", discountFound.Title())
+		t.Fatal("Discount title MUST BE 'DISCOUNT_TITLE_UPDATED', found: ", discountFound.Title())
 	}
 }
 
@@ -390,7 +390,7 @@ func TestStoreOderCreate(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER01_ID").
+		SetCustomerID("CUSTOMER01_ID").
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
@@ -427,7 +427,7 @@ func TestStoreOderDelete(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER01_ID").
+		SetCustomerID("CUSTOMER01_ID").
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
@@ -474,7 +474,7 @@ func TestStoreOderDeleteByID(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER01_ID").
+		SetCustomerID("CUSTOMER01_ID").
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
@@ -521,7 +521,7 @@ func TestStoreOrderFindByID(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER01_ID").
+		SetCustomerID("CUSTOMER01_ID").
 		SetQuantityInt(1).
 		SetPriceFloat(19.99).
 		SetMemo("test memo")
@@ -546,8 +546,8 @@ func TestStoreOrderFindByID(t *testing.T) {
 		t.Fatal("Order MUST NOT be nil")
 	}
 
-	if orderFound.UserID() != "USER01_ID" {
-		t.Fatal("Order user id MUST BE 'USER01_ID', found: ", orderFound.UserID())
+	if orderFound.CustomerID() != "CUSTOMER01_ID" {
+		t.Fatal("Order user id MUST BE 'CUSTOMER01_ID', found: ", orderFound.CustomerID())
 	}
 
 	if orderFound.Status() != ORDER_STATUS_PENDING {
@@ -601,7 +601,7 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER01_ID").
+		SetCustomerID("USER01_ID").
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
@@ -672,7 +672,7 @@ func TestStoreOrderUpdate(t *testing.T) {
 
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
-		SetUserID("USER01_ID").
+		SetCustomerID("CUSTOMER01_ID").
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 

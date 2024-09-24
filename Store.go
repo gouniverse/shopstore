@@ -351,11 +351,14 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 		}
 	}
 
-	if !options.WithDeleted {
-		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
+	if options.WithDeleted {
+		return q
 	}
 
-	return q
+	softDeleted := goqu.C(COLUMN_DELETED_AT).
+		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
+
+	return q.Where(softDeleted)
 }
 
 func (store *Store) OrderCount(options OrderQueryOptions) (int64, error) {
@@ -577,8 +580,8 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
-	if options.UserID != "" {
-		q = q.Where(goqu.C(COLUMN_USER_ID).Eq(options.UserID))
+	if options.CustomerID != "" {
+		q = q.Where(goqu.C(COLUMN_CUSTOMER_ID).Eq(options.CustomerID))
 	}
 
 	if options.Status != "" {
@@ -612,11 +615,14 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 		}
 	}
 
-	if !options.WithDeleted {
-		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
+	if options.WithDeleted {
+		return q
 	}
 
-	return q
+	softDeleted := goqu.C(COLUMN_DELETED_AT).
+		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
+
+	return q.Where(softDeleted)
 }
 
 func (store *Store) OrderLineItemCount(options OrderLineItemQueryOptions) (int64, error) {
@@ -870,11 +876,14 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 		}
 	}
 
-	if !options.WithDeleted {
-		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
+	if options.WithDeleted {
+		return q
 	}
 
-	return q
+	softDeleted := goqu.C(COLUMN_DELETED_AT).
+		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
+
+	return q.Where(softDeleted)
 }
 
 func (store *Store) ProductCount(options ProductQueryOptions) (int64, error) {
@@ -1131,11 +1140,14 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 		}
 	}
 
-	if !options.WithDeleted {
-		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
+	if options.WithDeleted {
+		return q
 	}
 
-	return q
+	softDeleted := goqu.C(COLUMN_DELETED_AT).
+		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
+
+	return q.Where(softDeleted)
 }
 
 type DiscountQueryOptions struct {
@@ -1155,7 +1167,7 @@ type DiscountQueryOptions struct {
 type OrderQueryOptions struct {
 	ID          string
 	IDIn        string
-	UserID      string
+	CustomerID  string
 	Status      string
 	StatusIn    []string
 	Offset      int

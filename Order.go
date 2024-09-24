@@ -106,6 +106,15 @@ func (order *Order) SetCreatedAt(createdAt string) OrderInterface {
 	return order
 }
 
+func (order *Order) CustomerID() string {
+	return order.Get(COLUMN_CUSTOMER_ID)
+}
+
+func (order *Order) SetCustomerID(id string) OrderInterface {
+	order.Set(COLUMN_CUSTOMER_ID, id)
+	return order
+}
+
 func (order *Order) DeletedAt() string {
 	return order.Get(COLUMN_DELETED_AT)
 }
@@ -252,14 +261,5 @@ func (order *Order) UpdatedAtCarbon() carbon.Carbon {
 
 func (order *Order) SetUpdatedAt(updatedAt string) OrderInterface {
 	order.Set(COLUMN_UPDATED_AT, updatedAt)
-	return order
-}
-
-func (order *Order) UserID() string {
-	return order.Get(COLUMN_USER_ID)
-}
-
-func (order *Order) SetUserID(id string) OrderInterface {
-	order.Set(COLUMN_USER_ID, id)
 	return order
 }

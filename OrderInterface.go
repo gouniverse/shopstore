@@ -27,6 +27,9 @@ type OrderInterface interface {
 	CreatedAtCarbon() carbon.Carbon
 	SetCreatedAt(createdAt string) OrderInterface
 
+	CustomerID() string
+	SetCustomerID(customerID string) OrderInterface
+
 	DeletedAt() string
 	DeletedAtCarbon() carbon.Carbon
 	SetDeletedAt(deletedAt string) OrderInterface
@@ -59,7 +62,4 @@ type OrderInterface interface {
 	UpdatedAt() string
 	UpdatedAtCarbon() carbon.Carbon
 	SetUpdatedAt(updatedAt string) OrderInterface
-
-	UserID() string
-	SetUserID(userID string) OrderInterface
 }

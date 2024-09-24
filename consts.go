@@ -3,6 +3,7 @@ package shopstore
 const COLUMN_AMOUNT = "amount"
 const COLUMN_CODE = "code"
 const COLUMN_CREATED_AT = "created_at"
+const COLUMN_CUSTOMER_ID = "customer_id"
 const COLUMN_DELETED_AT = "deleted_at"
 const COLUMN_DESCRIPTION = "description"
 const COLUMN_ENDS_AT = "ends_at"
@@ -18,7 +19,6 @@ const COLUMN_STATUS = "status"
 const COLUMN_TYPE = "type"
 const COLUMN_TITLE = "title"
 const COLUMN_UPDATED_AT = "updated_at"
-const COLUMN_USER_ID = "user_id"
 
 // Customer has completed the checkout process, but payment has yet to be confirmed.
 const ORDER_STATUS_AWAITING_PAYMENT = "awaiting_payment"
