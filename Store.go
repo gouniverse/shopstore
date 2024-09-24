@@ -78,6 +78,7 @@ func (st *Store) EnableDebug(debug bool) {
 func (store *Store) DiscountCreate(discount DiscountInterface) error {
 	discount.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	discount.SetDeletedAt(sb.MAX_DATETIME)
 
 	data := discount.Data()
 
@@ -273,19 +274,19 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 	q := goqu.Dialect(store.dbDriverName).From(store.discountTableName)
 
 	if options.ID != "" {
-		q = q.Where(goqu.C("id").Eq(options.ID))
+		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
 	if options.Status != "" {
-		q = q.Where(goqu.C("status").Eq(options.Status))
+		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
 	}
 
 	if len(options.StatusIn) > 0 {
-		q = q.Where(goqu.C("status").In(options.StatusIn))
+		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
 	}
 
 	if options.Code != "" {
-		q = q.Where(goqu.C("code").Eq(options.Code))
+		q = q.Where(goqu.C(COLUMN_CODE).Eq(options.Code))
 	}
 
 	if !options.CountOnly {
@@ -298,7 +299,7 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 		}
 	}
 
-	sortOrder := "desc"
+	sortOrder := sb.DESC
 	if options.SortOrder != "" {
 		sortOrder = options.SortOrder
 	}
@@ -312,7 +313,7 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 	}
 
 	if !options.WithDeleted {
-		q = q.Where(goqu.C("deleted_at").Eq(sb.NULL_DATETIME))
+		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
 	}
 
 	return q
@@ -360,7 +361,7 @@ func (store *Store) OrderCount(options OrderQueryOptions) (int64, error) {
 func (store *Store) OrderCreate(order OrderInterface) error {
 	order.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	order.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	order.SetDeletedAt(sb.NULL_DATETIME)
+	order.SetDeletedAt(sb.MAX_DATETIME)
 
 	data := order.Data()
 
@@ -559,7 +560,7 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 		}
 	}
 
-	sortOrder := "desc"
+	sortOrder := sb.DESC
 	if options.SortOrder != "" {
 		sortOrder = options.SortOrder
 	}
@@ -573,7 +574,7 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 	}
 
 	if !options.WithDeleted {
-		q = q.Where(goqu.C("deleted_at").Eq(sb.NULL_DATETIME))
+		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
 	}
 
 	return q
@@ -582,7 +583,7 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) error {
 	orderLineItem.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	orderLineItem.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	orderLineItem.SetDeletedAt(sb.NULL_DATETIME)
+	orderLineItem.SetDeletedAt(sb.MAX_DATETIME)
 
 	data := orderLineItem.Data()
 
@@ -778,7 +779,7 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 		}
 	}
 
-	sortOrder := "desc"
+	sortOrder := sb.DESC
 	if options.SortOrder != "" {
 		sortOrder = options.SortOrder
 	}
@@ -792,7 +793,7 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 	}
 
 	if !options.WithDeleted {
-		q = q.Where(goqu.C("deleted_at").Eq(sb.NULL_DATETIME))
+		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
 	}
 
 	return q
@@ -801,7 +802,7 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 func (store *Store) ProductCreate(product ProductInterface) error {
 	product.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	product.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	product.SetDeletedAt(sb.NULL_DATETIME)
+	product.SetDeletedAt(sb.MAX_DATETIME)
 
 	data := product.Data()
 
@@ -1014,7 +1015,7 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 	}
 
 	if !options.WithDeleted {
-		q = q.Where(goqu.C("deleted_at").Eq(sb.NULL_DATETIME))
+		q = q.Where(goqu.C(COLUMN_DELETED_AT).Gt(carbon.Now(carbon.UTC).ToDateTimeString()))
 	}
 
 	return q

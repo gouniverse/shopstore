@@ -197,7 +197,7 @@ func TestStoreDiscountFindByID(t *testing.T) {
 	}
 
 	if discountFound == nil {
-		t.Fatal("Exam MUST NOT be nil")
+		t.Fatal("Discount MUST NOT be nil")
 		return
 	}
 
@@ -240,7 +240,7 @@ func TestStoreDiscountFindByID(t *testing.T) {
 	// 	t.Fatal("Exam memo MUST BE 'test memo', found: ", examFound.Memo())
 	// }
 
-	if !strings.Contains(discountFound.DeletedAt(), sb.NULL_DATETIME) {
+	if !strings.Contains(discountFound.DeletedAt(), sb.MAX_DATETIME) {
 		t.Fatal("Exam MUST NOT be soft deleted", discountFound.DeletedAt())
 		return
 	}
@@ -574,7 +574,7 @@ func TestStoreOrderFindByID(t *testing.T) {
 		t.Fatal("Order size meta MUST BE 'xxl', found: ", orderFound.Meta("xxl"))
 	}
 
-	if !strings.Contains(orderFound.DeletedAt(), sb.NULL_DATETIME) {
+	if !strings.Contains(orderFound.DeletedAt(), sb.MAX_DATETIME) {
 		t.Fatal("Order MUST NOT be soft deleted", orderFound.DeletedAt())
 	}
 }
@@ -616,7 +616,7 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	if order.DeletedAt() != sb.NULL_DATETIME {
+	if order.DeletedAt() != sb.MAX_DATETIME {
 		t.Fatal("Order MUST NOT be soft deleted")
 	}
 
@@ -1037,7 +1037,7 @@ func TestStoreProductFindByID(t *testing.T) {
 		t.Fatal("Product size meta MUST BE 'xxl', found: ", productFound.Meta("xxl"))
 	}
 
-	if !strings.Contains(productFound.DeletedAt(), sb.NULL_DATETIME) {
+	if !strings.Contains(productFound.DeletedAt(), sb.MAX_DATETIME) {
 		t.Fatal("Product MUST NOT be soft deleted", productFound.DeletedAt())
 	}
 }
@@ -1074,7 +1074,7 @@ func TestStoreProductSoftDelete(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	if product.DeletedAt() != sb.NULL_DATETIME {
+	if product.DeletedAt() != sb.MAX_DATETIME {
 		t.Fatal("Product MUST NOT be soft deleted")
 	}
 

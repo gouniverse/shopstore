@@ -28,7 +28,7 @@ func NewOrder() OrderInterface {
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
-		SetDeletedAt(sb.NULL_DATETIME)
+		SetDeletedAt(sb.MAX_DATETIME)
 
 	o.SetMetas(map[string]string{})
 

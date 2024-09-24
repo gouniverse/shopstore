@@ -48,7 +48,7 @@ func NewDiscount() DiscountInterface {
 		SetEndsAt(sb.NULL_DATETIME).
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
-		SetDeletedAt(sb.NULL_DATETIME)
+		SetDeletedAt(sb.MAX_DATETIME)
 
 	return d
 }
