@@ -39,16 +39,19 @@ type OrderInterface interface {
 
 	Meta(name string) string
 	SetMeta(name string, value string) error
-
 	Metas() (map[string]string, error)
 	SetMetas(metas map[string]string) error
+	UpsertMetas(metas map[string]string) error
 
 	Price() string
+	SetPrice(price string) OrderInterface
 	PriceFloat() float64
-	SetPrice(price float64) OrderInterface
+	SetPriceFloat(price float64) OrderInterface
 
 	Quantity() string
-	SetQuantity(quantity int) OrderInterface
+	SetQuantity(quantity string) OrderInterface
+	QuantityInt() int64
+	SetQuantityInt(quantity int64) OrderInterface
 
 	Status() string
 	SetStatus(status string) OrderInterface
@@ -56,8 +59,6 @@ type OrderInterface interface {
 	UpdatedAt() string
 	UpdatedAtCarbon() carbon.Carbon
 	SetUpdatedAt(updatedAt string) OrderInterface
-
-	UpsertMetas(metas map[string]string) error
 
 	UserID() string
 	SetUserID(userID string) OrderInterface

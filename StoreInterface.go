@@ -1,6 +1,18 @@
 package shopstore
 
 type StoreInterface interface {
+	AutoMigrate() error
+	EnableDebug(debug bool)
+
+	ProductCreate(product ProductInterface) error
+	ProductDelete(product ProductInterface) error
+	ProductDeleteByID(productID string) error
+	ProductFindByID(productID string) (ProductInterface, error)
+	ProductList(options ProductQueryOptions) ([]ProductInterface, error)
+	ProductSoftDelete(product ProductInterface) error
+	ProductSoftDeleteByID(productID string) error
+	ProductUpdate(product ProductInterface) error
+
 	OrderCreate(order OrderInterface) error
 	OrderDelete(order OrderInterface) error
 	OrderDeleteByID(id string) error
@@ -8,6 +20,16 @@ type StoreInterface interface {
 	OrderList(options OrderQueryOptions) ([]OrderInterface, error)
 	OrderSoftDelete(order OrderInterface) error
 	OrderSoftDeleteByID(id string) error
+	OrderUpdate(order OrderInterface) error
+
+	OrderLineItemCreate(orderLineItem OrderLineItemInterface) error
+	OrderLineItemDelete(orderLineItem OrderLineItemInterface) error
+	OrderLineItemDeleteByID(id string) error
+	OrderLineItemFindByID(id string) (OrderLineItemInterface, error)
+	OrderLineItemList(options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error)
+	OrderLineItemSoftDelete(orderLineItem OrderLineItemInterface) error
+	OrderLineItemSoftDeleteByID(id string) error
+	OrderLineItemUpdate(orderLineItem OrderLineItemInterface) error
 
 	DiscountCreate(discount DiscountInterface) error
 	DiscountDelete(discount DiscountInterface) error

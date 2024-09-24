@@ -26,11 +26,12 @@ func TestStoreDiscountCreate(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_create",
-		OrderTableName:     "shop_order_create",
-		ProductTableName:   "shop_product_create",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -52,15 +53,116 @@ func TestStoreDiscountCreate(t *testing.T) {
 	}
 }
 
+func TestStoreDiscountDelete(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_delete",
+		OrderTableName:         "shop_order_delete",
+		OrderLineItemTableName: "shop_order_line_item_delete",
+		ProductTableName:       "shop_product_delete",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	discount := NewDiscount().
+		SetStatus(DISCOUNT_STATUS_DRAFT).
+		SetTitle("DISCOUNT_TITLE")
+
+	err = store.DiscountCreate(discount)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+		return
+	}
+
+	err = store.DiscountDelete(discount)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	discountFound, errFind := store.DiscountFindByID(discount.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+		return
+	}
+
+	if discountFound != nil {
+		t.Fatal("Exam MUST be nil")
+		return
+	}
+}
+
+func TestStoreDiscountDeleteByID(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_delete_by_id",
+		OrderTableName:         "shop_order_delete_by_id",
+		OrderLineItemTableName: "shop_order_line_item_delete_by_id",
+		ProductTableName:       "shop_product_delete_by_id",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	discount := NewDiscount().
+		SetStatus(DISCOUNT_STATUS_DRAFT).
+		SetTitle("DISCOUNT_TITLE")
+
+	err = store.DiscountCreate(discount)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+		return
+	}
+
+	err = store.DiscountDeleteByID(discount.ID())
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	discountFound, errFind := store.DiscountFindByID(discount.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+		return
+	}
+
+	if discountFound != nil {
+		t.Fatal("Exam MUST be nil")
+		return
+	}
+}
+
 func TestStoreDiscountFindByID(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_find_by_id",
-		OrderTableName:     "shop_order_find_by_id",
-		ProductTableName:   "shop_product_find_by_id",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_find_by_id",
+		OrderTableName:         "shop_order_find_by_id",
+		OrderLineItemTableName: "shop_order_line_item_find_by_id",
+		ProductTableName:       "shop_product_find_by_id",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -144,15 +246,138 @@ func TestStoreDiscountFindByID(t *testing.T) {
 	}
 }
 
+func TestStoreDiscountSoftDelete(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_soft_delete",
+		OrderTableName:         "shop_order_soft_delete",
+		OrderLineItemTableName: "shop_order_line_item_soft_delete",
+		ProductTableName:       "shop_product_soft_delete",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	discount := NewDiscount().
+		SetStatus(DISCOUNT_STATUS_DRAFT).
+		SetTitle("DISCOUNT_TITLE")
+
+	err = store.DiscountCreate(discount)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+		return
+	}
+
+	err = store.DiscountSoftDelete(discount)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+		return
+	}
+
+	discountFound, errFind := store.DiscountFindByID(discount.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+		return
+	}
+
+	if discountFound != nil {
+		t.Fatal("Discount MUST be nil")
+		return
+	}
+
+	discountList, errList := store.DiscountList(DiscountQueryOptions{
+		ID:          discount.ID(),
+		WithDeleted: true,
+	})
+
+	if errList != nil {
+		t.Fatal("unexpected error:", errList)
+		return
+	}
+
+	if len(discountList) != 1 {
+		t.Fatal("Discount list MUST be 1")
+		return
+	}
+}
+
+func TestStoreDiscountUpdate(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_update",
+		OrderTableName:         "shop_order_update",
+		OrderLineItemTableName: "shop_order_line_item_update",
+		ProductTableName:       "shop_product_update",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	discount := NewDiscount().
+		SetStatus(DISCOUNT_STATUS_DRAFT).
+		SetTitle("DISCOUNT_TITLE").
+		SetDescription("DISCOUNT_DESCRIPTION").
+		SetType(DISCOUNT_TYPE_AMOUNT).
+		SetAmount(19.99).
+		SetStartsAt(`2022-01-01 00:00:00`).
+		SetEndsAt(`2022-01-01 23:59:59`)
+
+	err = store.DiscountCreate(discount)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+		return
+	}
+
+	discount.SetTitle("DISCOUNT_TITLE_UPDATED")
+
+	err = store.DiscountUpdate(discount)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+		return
+	}
+
+	discountFound, errFind := store.DiscountFindByID(discount.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if discountFound == nil {
+		t.Fatal("Exam MUST NOT be nil")
+	}
+
+	if discountFound.Title() != "DISCOUNT_TITLE_UPDATED" {
+		t.Fatal("Exam title MUST BE 'DISCOUNT_TITLE_UPDATED', found: ", discountFound.Title())
+	}
+}
+
 func TestStoreOderCreate(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_create",
-		OrderTableName:     "shop_order_create",
-		ProductTableName:   "shop_product_create",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -166,8 +391,8 @@ func TestStoreOderCreate(t *testing.T) {
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
 		SetUserID("USER01_ID").
-		SetQuantity(1).
-		SetPrice(19.99)
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
 
 	order.SetMetas(map[string]string{
 		"color": "green",
@@ -180,15 +405,16 @@ func TestStoreOderCreate(t *testing.T) {
 	}
 }
 
-func TestStoreOrderFindByID(t *testing.T) {
+func TestStoreOderDelete(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_find_by_id",
-		OrderTableName:     "shop_order_find_by_id",
-		ProductTableName:   "shop_product_find_by_id",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_delete",
+		OrderTableName:         "shop_order_delete",
+		OrderLineItemTableName: "shop_order_line_item_delete",
+		ProductTableName:       "shop_product_delete",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -202,8 +428,102 @@ func TestStoreOrderFindByID(t *testing.T) {
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
 		SetUserID("USER01_ID").
-		SetQuantity(1).
-		SetPrice(19.99).
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderCreate(order)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.OrderDelete(order)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderFound, err := store.OrderFindByID(order.ID())
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if orderFound != nil {
+		t.Fatal("expected nil order")
+	}
+}
+
+func TestStoreOderDeleteByID(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_delete",
+		OrderTableName:         "shop_order_delete",
+		OrderLineItemTableName: "shop_order_line_item_delete",
+		ProductTableName:       "shop_product_delete",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	order := NewOrder().
+		SetStatus(ORDER_STATUS_PENDING).
+		SetUserID("USER01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderCreate(order)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.OrderDeleteByID(order.ID())
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderFound, err := store.OrderFindByID(order.ID())
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if orderFound != nil {
+		t.Fatal("expected nil order")
+	}
+}
+
+func TestStoreOrderFindByID(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_find_by_id",
+		OrderTableName:         "shop_order_find_by_id",
+		OrderLineItemTableName: "shop_order_line_item_find_by_id",
+		ProductTableName:       "shop_product_find_by_id",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	order := NewOrder().
+		SetStatus(ORDER_STATUS_PENDING).
+		SetUserID("USER01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99).
 		SetMemo("test memo")
 
 	order.SetMetas(map[string]string{
@@ -263,11 +583,12 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_soft_delete",
-		OrderTableName:     "shop_order_soft_delete",
-		ProductTableName:   "shop_product_soft_delete",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_soft_delete",
+		OrderTableName:         "shop_order_soft_delete",
+		OrderLineItemTableName: "shop_order_line_item_soft_delete",
+		ProductTableName:       "shop_product_soft_delete",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -281,8 +602,8 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 	order := NewOrder().
 		SetStatus(ORDER_STATUS_PENDING).
 		SetUserID("USER01_ID").
-		SetQuantity(1).
-		SetPrice(19.99)
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
 
 	err = store.OrderCreate(order)
 	if err != nil {
@@ -311,7 +632,6 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 
 	orderFindWithDeleted, errFind := store.OrderList(OrderQueryOptions{
 		ID:          order.ID(),
-		Limit:       1,
 		WithDeleted: true,
 	})
 
@@ -330,15 +650,292 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 
 }
 
+func TestStoreOrderUpdate(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_update",
+		OrderTableName:         "shop_order_update",
+		OrderLineItemTableName: "shop_order_line_item_update",
+		ProductTableName:       "shop_product_update",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	order := NewOrder().
+		SetStatus(ORDER_STATUS_PENDING).
+		SetUserID("USER01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderCreate(order)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	order.SetMemo("test memo")
+
+	err = store.OrderUpdate(order)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderFound, errFind := store.OrderFindByID(order.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if orderFound == nil {
+		t.Fatal("Order MUST NOT be nil")
+	}
+
+	if orderFound.Memo() != "test memo" {
+		t.Fatal("Order memo MUST BE 'test memo', found: ", orderFound.Memo())
+	}
+}
+
+func TestStoreOrderLineItemCreate(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	orderLineItem := NewOrderLineItem().
+		SetOrderID("ORDER01_ID").
+		SetProductID("PRODUCT01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderLineItemCreate(orderLineItem)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+}
+
+func TestStoreOrderLineItemDelete(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_delete",
+		OrderTableName:         "shop_order_delete",
+		OrderLineItemTableName: "shop_order_line_item_delete",
+		ProductTableName:       "shop_product_delete",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	orderLineItem := NewOrderLineItem().
+		SetOrderID("ORDER01_ID").
+		SetProductID("PRODUCT01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderLineItemCreate(orderLineItem)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.OrderLineItemDelete(orderLineItem)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderLineItemFound, errFind := store.OrderLineItemFindByID(orderLineItem.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if orderLineItemFound != nil {
+		t.Fatal("OrderLineItem MUST be nil")
+	}
+}
+
+func TestStoreOrderLineItemFindByID(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	orderLineItem := NewOrderLineItem().
+		SetOrderID("ORDER01_ID").
+		SetProductID("PRODUCT01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderLineItemCreate(orderLineItem)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderLineItemFound, errFind := store.OrderLineItemFindByID(orderLineItem.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if orderLineItemFound == nil {
+		t.Fatal("OrderLineItem MUST NOT be nil")
+	}
+}
+
+func TestStoreOrderLineItemList(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	orderLineItem := NewOrderLineItem().
+		SetOrderID("ORDER01_ID").
+		SetProductID("PRODUCT01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderLineItemCreate(orderLineItem)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderLineItemsFound, errFind := store.OrderLineItemList(OrderLineItemQueryOptions{})
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if len(orderLineItemsFound) != 1 {
+		t.Fatal("OrderLineItem MUST NOT be nil")
+	}
+}
+
+func TestStoreOrderLineItemSoftDeleteByID(t *testing.T) {
+	db := initDB(":memory:")
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		DiscountTableName:      "shop_discount_soft_delete",
+		OrderTableName:         "shop_order_soft_delete",
+		OrderLineItemTableName: "shop_order_line_item_soft_delete",
+		ProductTableName:       "shop_product_soft_delete",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	orderLineItem := NewOrderLineItem().
+		SetOrderID("ORDER01_ID").
+		SetProductID("PRODUCT01_ID").
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
+
+	err = store.OrderLineItemCreate(orderLineItem)
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.OrderLineItemSoftDeleteByID(orderLineItem.ID())
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	orderLineItemFound, errFind := store.OrderLineItemFindByID(orderLineItem.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if orderLineItemFound != nil {
+		t.Fatal("OrderLineItem MUST be nil")
+	}
+
+	orderLineItems, errFind := store.OrderLineItemList(OrderLineItemQueryOptions{
+		OrderID:     orderLineItem.OrderID(),
+		WithDeleted: true,
+	})
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if len(orderLineItems) != 1 {
+		t.Fatal("OrderLineItem MUST be deleted")
+	}
+}
+
 func TestStoreProductCreate(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_create",
-		OrderTableName:     "shop_order_create",
-		ProductTableName:   "shop_product_create",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -369,11 +966,12 @@ func TestStoreProductFindByID(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_find_by_id",
-		OrderTableName:     "shop_order_find_by_id",
-		ProductTableName:   "shop_product_find_by_id",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_find_by_id",
+		OrderTableName:         "shop_order_find_by_id",
+		OrderLineItemTableName: "shop_order_line_item_find_by_id",
+		ProductTableName:       "shop_product_find_by_id",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {
@@ -448,11 +1046,12 @@ func TestStoreProductSoftDelete(t *testing.T) {
 	db := initDB(":memory:")
 
 	store, err := NewStore(NewStoreOptions{
-		DB:                 db,
-		DiscountTableName:  "shop_discount_soft_delete",
-		OrderTableName:     "shop_order_soft_delete",
-		ProductTableName:   "shop_product_soft_delete",
-		AutomigrateEnabled: true,
+		DB:                     db,
+		DiscountTableName:      "shop_discount_soft_delete",
+		OrderTableName:         "shop_order_soft_delete",
+		OrderLineItemTableName: "shop_order_line_item_soft_delete",
+		ProductTableName:       "shop_product_soft_delete",
+		AutomigrateEnabled:     true,
 	})
 
 	if err != nil {

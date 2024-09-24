@@ -23,8 +23,8 @@ func NewOrder() OrderInterface {
 	o := (&Order{}).
 		SetID(uid.HumanUid()).
 		SetStatus(ORDER_STATUS_PENDING).
-		SetQuantity(1). // By default 1
-		SetPrice(0).    // Free. By default
+		SetQuantityInt(1). // By default 1
+		SetPriceFloat(0).  // Free. By default
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
@@ -208,13 +208,18 @@ func (order *Order) Price() string {
 	return order.Get(COLUMN_PRICE)
 }
 
+func (order *Order) SetPrice(price string) OrderInterface {
+	order.Set(COLUMN_PRICE, price)
+	return order
+}
+
 func (order *Order) PriceFloat() float64 {
 	price, _ := utils.ToFloat(order.Get(COLUMN_PRICE))
 	return price
 }
 
-func (order *Order) SetPrice(price float64) OrderInterface {
-	order.Set(COLUMN_PRICE, utils.ToString(price))
+func (order *Order) SetPriceFloat(price float64) OrderInterface {
+	order.SetPrice(utils.ToString(price))
 	return order
 }
 
@@ -222,13 +227,18 @@ func (order *Order) Quantity() string {
 	return order.Get(COLUMN_QUANTITY)
 }
 
+func (order *Order) SetQuantity(quantity string) OrderInterface {
+	order.Set(COLUMN_QUANTITY, quantity)
+	return order
+}
+
 func (order *Order) QuantityInt() int64 {
 	quantity, _ := utils.ToInt(order.Quantity())
 	return quantity
 }
 
-func (order *Order) SetQuantity(quantity int) OrderInterface {
-	order.Set(COLUMN_QUANTITY, utils.ToString(quantity))
+func (order *Order) SetQuantityInt(quantity int64) OrderInterface {
+	order.SetQuantity(utils.ToString(quantity))
 	return order
 }
 

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/doug-martin/goqu/v9"
@@ -18,14 +19,15 @@ import (
 var _ StoreInterface = (*Store)(nil) // verify it extends the interface
 
 type Store struct {
-	discountTableName  string
-	orderTableName     string
-	productTableName   string
-	db                 *sql.DB
-	dbDriverName       string
-	timeoutSeconds     int64
-	automigrateEnabled bool
-	debugEnabled       bool
+	discountTableName      string
+	orderTableName         string
+	orderLineItemTableName string
+	productTableName       string
+	db                     *sql.DB
+	dbDriverName           string
+	timeoutSeconds         int64
+	automigrateEnabled     bool
+	debugEnabled           bool
 }
 
 // AutoMigrate auto migrate
@@ -39,6 +41,15 @@ func (store *Store) AutoMigrate() error {
 	}
 
 	sql = store.sqlOrderTableCreate()
+
+	_, err = store.db.Exec(sql)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	sql = store.sqlOrderLineItemTableCreate()
 
 	_, err = store.db.Exec(sql)
 
@@ -111,7 +122,7 @@ func (store *Store) DiscountDeleteByID(id string) error {
 	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
 		Delete(store.discountTableName).
 		Prepared(true).
-		Where(goqu.C("id").Eq(id)).
+		Where(goqu.C(COLUMN_ID).Eq(id)).
 		ToSQL()
 
 	if errSql != nil {
@@ -221,16 +232,16 @@ func (store *Store) DiscountSoftDeleteByID(id string) error {
 
 func (store *Store) DiscountUpdate(discount DiscountInterface) error {
 	if discount == nil {
-		return errors.New("order is nil")
+		return errors.New("discount is nil")
 	}
 
 	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString())
 
 	dataChanged := discount.DataChanged()
 
-	delete(dataChanged, "id")   // ID is not updateable
-	delete(dataChanged, "hash") // Hash is not updateable
-	delete(dataChanged, "data") // Data is not updateable
+	delete(dataChanged, COLUMN_ID) // ID is not updateable
+	delete(dataChanged, "hash")    // Hash is not updateable
+	delete(dataChanged, "data")    // Data is not updateable
 
 	if len(dataChanged) < 1 {
 		return nil
@@ -305,6 +316,45 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 	}
 
 	return q
+}
+
+func (store *Store) OrderCount(options OrderQueryOptions) (int64, error) {
+	options.CountOnly = true
+	q := store.orderQuery(options)
+
+	sqlStr, params, errSql := q.Prepared(true).
+		Limit(1).
+		Select(goqu.COUNT(goqu.Star()).As("count")).
+		ToSQL()
+
+	if errSql != nil {
+		return -1, nil
+	}
+
+	if store.debugEnabled {
+		log.Println(sqlStr)
+	}
+
+	db := sb.NewDatabase(store.db, store.dbDriverName)
+	mapped, err := db.SelectToMapString(sqlStr, params...)
+	if err != nil {
+		return -1, err
+	}
+
+	if len(mapped) < 1 {
+		return -1, nil
+	}
+
+	countStr := mapped[0]["count"]
+
+	i, err := strconv.ParseInt(countStr, 10, 64)
+
+	if err != nil {
+		return -1, err
+
+	}
+
+	return i, nil
 }
 
 func (store *Store) OrderCreate(order OrderInterface) error {
@@ -450,7 +500,9 @@ func (store *Store) OrderUpdate(order OrderInterface) error {
 
 	dataChanged := order.DataChanged()
 
-	delete(dataChanged, "id") // ID is not updateable
+	delete(dataChanged, "id")   // ID is not updateable
+	delete(dataChanged, "hash") // Hash is not updateable
+	delete(dataChanged, "data") // Data is not updateable
 
 	if len(dataChanged) < 1 {
 		return nil
@@ -482,23 +534,238 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 	q := goqu.Dialect(store.dbDriverName).From(store.orderTableName)
 
 	if options.ID != "" {
-		q = q.Where(goqu.C("id").Eq(options.ID))
+		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
 	if options.UserID != "" {
-		q = q.Where(goqu.C("user_id").Eq(options.UserID))
-	}
-
-	if options.ExamID != "" {
-		q = q.Where(goqu.C("exam_id").Eq(options.ExamID))
+		q = q.Where(goqu.C(COLUMN_USER_ID).Eq(options.UserID))
 	}
 
 	if options.Status != "" {
-		q = q.Where(goqu.C("status").Eq(options.Status))
+		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
 	}
 
 	if len(options.StatusIn) > 0 {
-		q = q.Where(goqu.C("status").In(options.StatusIn))
+		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
+	}
+
+	if !options.CountOnly {
+		if options.Limit > 0 {
+			q = q.Limit(uint(options.Limit))
+		}
+
+		if options.Offset > 0 {
+			q = q.Offset(uint(options.Offset))
+		}
+	}
+
+	sortOrder := "desc"
+	if options.SortOrder != "" {
+		sortOrder = options.SortOrder
+	}
+
+	if options.OrderBy != "" {
+		if strings.EqualFold(sortOrder, sb.ASC) {
+			q = q.Order(goqu.I(options.OrderBy).Asc())
+		} else {
+			q = q.Order(goqu.I(options.OrderBy).Desc())
+		}
+	}
+
+	if !options.WithDeleted {
+		q = q.Where(goqu.C("deleted_at").Eq(sb.NULL_DATETIME))
+	}
+
+	return q
+}
+
+func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) error {
+	orderLineItem.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	orderLineItem.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	orderLineItem.SetDeletedAt(sb.NULL_DATETIME)
+
+	data := orderLineItem.Data()
+
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Insert(store.orderLineItemTableName).
+		Prepared(true).
+		Rows(data).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	if err != nil {
+		return err
+	}
+
+	orderLineItem.MarkAsNotDirty()
+
+	return nil
+}
+
+func (store *Store) OrderLineItemDeleteByID(id string) error {
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Delete(store.orderLineItemTableName).
+		Prepared(true).
+		Where(goqu.C("id").Eq(id)).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	return err
+}
+
+func (store *Store) OrderLineItemDelete(orderLineItem OrderLineItemInterface) error {
+	return store.OrderLineItemDeleteByID(orderLineItem.ID())
+}
+
+func (store *Store) OrderLineItemFindByID(id string) (OrderLineItemInterface, error) {
+	if id == "" {
+		return nil, errors.New("order line id is empty")
+	}
+
+	list, err := store.OrderLineItemList(OrderLineItemQueryOptions{
+		ID:    id,
+		Limit: 1,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(list) > 0 {
+		return list[0], nil
+	}
+
+	return nil, nil
+}
+
+func (store *Store) OrderLineItemList(options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error) {
+	q := store.orderLineItemQuery(options)
+
+	sqlStr, params, errSql := q.Prepared(true).ToSQL()
+	if errSql != nil {
+		return nil, errSql
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	db := sb.NewDatabase(store.db, store.dbDriverName)
+
+	modelMaps, err := db.SelectToMapString(sqlStr, params...)
+
+	if err != nil {
+		return []OrderLineItemInterface{}, err
+	}
+
+	list := []OrderLineItemInterface{}
+
+	lo.ForEach(modelMaps, func(modelMap map[string]string, index int) {
+		model := NewOrderLineItemFromExistingData(modelMap)
+		list = append(list, model)
+	})
+
+	return list, nil
+}
+
+func (store *Store) OrderLineItemSoftDelete(orderLineItem OrderLineItemInterface) error {
+	if orderLineItem == nil {
+		return errors.New("order line is empty")
+	}
+
+	orderLineItem.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+
+	return store.OrderLineItemUpdate(orderLineItem)
+}
+
+func (store *Store) OrderLineItemSoftDeleteByID(id string) error {
+	item, err := store.OrderLineItemFindByID(id)
+
+	if err != nil {
+		return err
+	}
+
+	return store.OrderLineItemSoftDelete(item)
+}
+
+func (store *Store) OrderLineItemUpdate(orderLineItem OrderLineItemInterface) error {
+	if orderLineItem == nil {
+		return errors.New("orderLineItem is nil")
+	}
+
+	orderLineItem.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+
+	dataChanged := orderLineItem.DataChanged()
+
+	delete(dataChanged, COLUMN_ID) // ID is not updateable
+	delete(dataChanged, "hash")    // Hash is not updateable
+	delete(dataChanged, "data")    // Data is not updateable
+
+	if len(dataChanged) < 1 {
+		return nil
+	}
+
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Update(store.orderLineItemTableName).
+		Prepared(true).
+		Set(dataChanged).
+		Where(goqu.C(COLUMN_ID).Eq(orderLineItem.ID())).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		cfmt.Infoln(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	orderLineItem.MarkAsNotDirty()
+
+	return err
+}
+
+func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.SelectDataset {
+	q := goqu.Dialect(store.dbDriverName).From(store.orderLineItemTableName)
+
+	if options.ID != "" {
+		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
+	}
+
+	if options.OrderID != "" {
+		q = q.Where(goqu.C(COLUMN_ORDER_ID).Eq(options.OrderID))
+	}
+
+	if options.ProductID != "" {
+		q = q.Where(goqu.C(COLUMN_PRODUCT_ID).Eq(options.ProductID))
+	}
+
+	if options.Status != "" {
+		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
+	}
+
+	if len(options.StatusIn) > 0 {
+		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
 	}
 
 	if !options.CountOnly {
@@ -561,6 +828,38 @@ func (store *Store) ProductCreate(product ProductInterface) error {
 	product.MarkAsNotDirty()
 
 	return nil
+}
+
+func (store *Store) ProductDelete(product ProductInterface) error {
+	if product == nil {
+		return errors.New("product is nil")
+	}
+
+	return store.ProductDeleteByID(product.ID())
+}
+
+func (store *Store) ProductDeleteByID(id string) error {
+	if id == "" {
+		return errors.New("product id is empty")
+	}
+
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Delete(store.productTableName).
+		Prepared(true).
+		Where(goqu.C(COLUMN_ID).Eq(id)).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		log.Println(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	return err
 }
 
 func (store *Store) ProductSoftDelete(product ProductInterface) error {
@@ -642,7 +941,9 @@ func (store *Store) ProductUpdate(product ProductInterface) error {
 
 	dataChanged := product.DataChanged()
 
-	delete(dataChanged, "id") // ID is not updateable
+	delete(dataChanged, COLUMN_ID) // ID is not updateable
+	delete(dataChanged, "hash")    // Hash is not updateable
+	delete(dataChanged, "data")    // Data is not updateable
 
 	if len(dataChanged) < 1 {
 		return nil
@@ -652,7 +953,7 @@ func (store *Store) ProductUpdate(product ProductInterface) error {
 		Update(store.productTableName).
 		Prepared(true).
 		Set(dataChanged).
-		Where(goqu.C("id").Eq(product.ID())).
+		Where(goqu.C(COLUMN_ID).Eq(product.ID())).
 		ToSQL()
 
 	if errSql != nil {
@@ -737,7 +1038,21 @@ type OrderQueryOptions struct {
 	ID          string
 	IDIn        string
 	UserID      string
-	ExamID      string
+	Status      string
+	StatusIn    []string
+	Offset      int
+	Limit       int
+	SortOrder   string
+	OrderBy     string
+	CountOnly   bool
+	WithDeleted bool
+}
+
+type OrderLineItemQueryOptions struct {
+	ID          string
+	IDIn        string
+	OrderID     string
+	ProductID   string
 	Status      string
 	StatusIn    []string
 	Offset      int
