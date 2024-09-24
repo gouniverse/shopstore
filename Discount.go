@@ -27,9 +27,13 @@ type Discount struct {
 	dataobject.DataObject
 }
 
+// == INTERFACES =============================================================
+
+var _ DiscountInterface = (*Discount)(nil)
+
 // == CONSTRUCTORS ===========================================================
 
-func NewDiscount() *Discount {
+func NewDiscount() DiscountInterface {
 	code := uid.Timestamp()
 
 	d := (&Discount{}).
@@ -49,7 +53,7 @@ func NewDiscount() *Discount {
 	return d
 }
 
-func NewDiscountFromExistingData(data map[string]string) *Discount {
+func NewDiscountFromExistingData(data map[string]string) DiscountInterface {
 	o := &Discount{}
 	o.Hydrate(data)
 	return o
@@ -70,7 +74,7 @@ func (d *Discount) Amount() float64 {
 	return amount
 }
 
-func (d *Discount) SetAmount(amount float64) *Discount {
+func (d *Discount) SetAmount(amount float64) DiscountInterface {
 	amountStr := utils.ToString(amount)
 	d.Set(COLUMN_AMOUNT, amountStr)
 	return d
@@ -80,7 +84,7 @@ func (d *Discount) Code() string {
 	return d.Get(COLUMN_CODE)
 }
 
-func (d *Discount) SetCode(code string) *Discount {
+func (d *Discount) SetCode(code string) DiscountInterface {
 	d.Set(COLUMN_CODE, code)
 	return d
 }
@@ -94,7 +98,7 @@ func (d *Discount) CreatedAtCarbon() carbon.Carbon {
 	return carbon.Parse(createdAt)
 }
 
-func (d *Discount) SetCreatedAt(createdAt string) *Discount {
+func (d *Discount) SetCreatedAt(createdAt string) DiscountInterface {
 	d.Set(COLUMN_CREATED_AT, createdAt)
 	return d
 }
@@ -103,7 +107,7 @@ func (d *Discount) DeletedAt() string {
 	return d.Get(COLUMN_DELETED_AT)
 }
 
-func (d *Discount) SetDeletedAt(deletedAt string) *Discount {
+func (d *Discount) SetDeletedAt(deletedAt string) DiscountInterface {
 	d.Set(COLUMN_DELETED_AT, deletedAt)
 	return d
 }
@@ -112,7 +116,7 @@ func (d *Discount) Description() string {
 	return d.Get(COLUMN_DESCRIPTION)
 }
 
-func (d *Discount) SetDescription(description string) *Discount {
+func (d *Discount) SetDescription(description string) DiscountInterface {
 	d.Set(COLUMN_DESCRIPTION, description)
 	return d
 }
@@ -126,7 +130,7 @@ func (d *Discount) EndsAtCarbon() carbon.Carbon {
 	return carbon.Parse(endsAt)
 }
 
-func (d *Discount) SetEndsAt(endsAt string) *Discount {
+func (d *Discount) SetEndsAt(endsAt string) DiscountInterface {
 	d.Set(COLUMN_ENDS_AT, endsAt)
 	return d
 }
@@ -137,7 +141,7 @@ func (o *Discount) ID() string {
 }
 
 // SetID sets the ID of the exam
-func (o *Discount) SetID(id string) *Discount {
+func (o *Discount) SetID(id string) DiscountInterface {
 	o.Set(COLUMN_ID, id)
 	return o
 }
@@ -151,7 +155,7 @@ func (d *Discount) StartsAtCarbon() carbon.Carbon {
 	return carbon.Parse(startsAt)
 }
 
-func (d *Discount) SetStartsAt(startsAt string) *Discount {
+func (d *Discount) SetStartsAt(startsAt string) DiscountInterface {
 	d.Set(COLUMN_STARTS_AT, startsAt)
 	return d
 }
@@ -160,7 +164,7 @@ func (d *Discount) Status() string {
 	return d.Get(COLUMN_STATUS)
 }
 
-func (d *Discount) SetStatus(status string) *Discount {
+func (d *Discount) SetStatus(status string) DiscountInterface {
 	d.Set(COLUMN_STATUS, status)
 	return d
 }
@@ -169,7 +173,7 @@ func (d *Discount) Title() string {
 	return d.Get(COLUMN_TITLE)
 }
 
-func (d *Discount) SetTitle(title string) *Discount {
+func (d *Discount) SetTitle(title string) DiscountInterface {
 	d.Set(COLUMN_TITLE, title)
 	return d
 }
@@ -178,7 +182,7 @@ func (d *Discount) Type() string {
 	return d.Get(COLUMN_TYPE)
 }
 
-func (d *Discount) SetType(type_ string) *Discount {
+func (d *Discount) SetType(type_ string) DiscountInterface {
 	d.Set(COLUMN_TYPE, type_)
 	return d
 }
@@ -192,7 +196,7 @@ func (d *Discount) UpdatedAtCarbon() carbon.Carbon {
 	return carbon.Parse(updatedAt)
 }
 
-func (d *Discount) SetUpdatedAt(updatedAt string) *Discount {
+func (d *Discount) SetUpdatedAt(updatedAt string) DiscountInterface {
 	d.Set(COLUMN_UPDATED_AT, updatedAt)
 	return d
 }

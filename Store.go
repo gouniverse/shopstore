@@ -64,7 +64,7 @@ func (st *Store) EnableDebug(debug bool) {
 	st.debugEnabled = debug
 }
 
-func (store *Store) DiscountCreate(discount *Discount) error {
+func (store *Store) DiscountCreate(discount DiscountInterface) error {
 	discount.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
@@ -95,7 +95,7 @@ func (store *Store) DiscountCreate(discount *Discount) error {
 	return nil
 }
 
-func (store *Store) DiscountDelete(discount *Discount) error {
+func (store *Store) DiscountDelete(discount DiscountInterface) error {
 	if discount == nil {
 		return errors.New("discount is nil")
 	}
@@ -127,7 +127,7 @@ func (store *Store) DiscountDeleteByID(id string) error {
 	return err
 }
 
-func (store *Store) DiscountFindByID(id string) (*Discount, error) {
+func (store *Store) DiscountFindByID(id string) (DiscountInterface, error) {
 	if id == "" {
 		return nil, errors.New("discount id is empty")
 	}
@@ -142,13 +142,13 @@ func (store *Store) DiscountFindByID(id string) (*Discount, error) {
 	}
 
 	if len(list) > 0 {
-		return &list[0], nil
+		return list[0], nil
 	}
 
 	return nil, nil
 }
 
-func (store *Store) DiscountFindByCode(code string) (*Discount, error) {
+func (store *Store) DiscountFindByCode(code string) (DiscountInterface, error) {
 	if code == "" {
 		return nil, errors.New("discount code is empty")
 	}
@@ -164,19 +164,19 @@ func (store *Store) DiscountFindByCode(code string) (*Discount, error) {
 	}
 
 	if len(list) > 0 {
-		return &list[0], nil
+		return list[0], nil
 	}
 
 	return nil, nil
 }
 
-func (store *Store) DiscountList(options DiscountQueryOptions) ([]Discount, error) {
+func (store *Store) DiscountList(options DiscountQueryOptions) ([]DiscountInterface, error) {
 	q := store.discountQuery(options)
 
 	sqlStr, _, errSql := q.Select().ToSQL()
 
 	if errSql != nil {
-		return []Discount{}, nil
+		return []DiscountInterface{}, nil
 	}
 
 	if store.debugEnabled {
@@ -186,20 +186,20 @@ func (store *Store) DiscountList(options DiscountQueryOptions) ([]Discount, erro
 	db := sb.NewDatabase(store.db, store.dbDriverName)
 	modelMaps, err := db.SelectToMapString(sqlStr)
 	if err != nil {
-		return []Discount{}, err
+		return []DiscountInterface{}, err
 	}
 
-	list := []Discount{}
+	list := []DiscountInterface{}
 
 	lo.ForEach(modelMaps, func(modelMap map[string]string, index int) {
 		model := NewDiscountFromExistingData(modelMap)
-		list = append(list, *model)
+		list = append(list, model)
 	})
 
 	return list, nil
 }
 
-func (store *Store) DiscountSoftDelete(discount *Discount) error {
+func (store *Store) DiscountSoftDelete(discount DiscountInterface) error {
 	if discount == nil {
 		return errors.New("discount is nil")
 	}
@@ -219,12 +219,12 @@ func (store *Store) DiscountSoftDeleteByID(id string) error {
 	return store.DiscountSoftDelete(discount)
 }
 
-func (store *Store) DiscountUpdate(discount *Discount) error {
+func (store *Store) DiscountUpdate(discount DiscountInterface) error {
 	if discount == nil {
 		return errors.New("order is nil")
 	}
 
-	// discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString())
+	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString())
 
 	dataChanged := discount.DataChanged()
 
@@ -337,6 +337,38 @@ func (store *Store) OrderCreate(order OrderInterface) error {
 	order.MarkAsNotDirty()
 
 	return nil
+}
+
+func (store *Store) OrderDelete(order OrderInterface) error {
+	if order == nil {
+		return errors.New("order is nil")
+	}
+
+	return store.OrderDeleteByID(order.ID())
+}
+
+func (store *Store) OrderDeleteByID(id string) error {
+	if id == "" {
+		return errors.New("order id is empty")
+	}
+
+	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
+		Delete(store.orderTableName).
+		Prepared(true).
+		Where(goqu.C(COLUMN_ID).Eq(id)).
+		ToSQL()
+
+	if errSql != nil {
+		return errSql
+	}
+
+	if store.debugEnabled {
+		log.Println(sqlStr)
+	}
+
+	_, err := store.db.Exec(sqlStr, params...)
+
+	return err
 }
 
 func (store *Store) OrderSoftDelete(order OrderInterface) error {
