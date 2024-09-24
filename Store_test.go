@@ -351,8 +351,8 @@ func TestStoreProductCreate(t *testing.T) {
 
 	product := NewProduct().
 		SetStatus(PRODUCT_STATUS_DRAFT).
-		SetQuantity(1).
-		SetPrice(19.99)
+		SetQuantityInt(1).
+		SetPriceFloat(19.99)
 
 	product.SetMetas(map[string]string{
 		"color": "green",
@@ -387,8 +387,8 @@ func TestStoreProductFindByID(t *testing.T) {
 	product := NewProduct().
 		SetStatus(PRODUCT_STATUS_DRAFT).
 		SetTitle("Ruler").
-		SetQuantity(1).
-		SetPrice(19.99).
+		SetQuantityInt(1).
+		SetPriceFloat(19.99).
 		SetMemo("test ruler")
 
 	product.SetMetas(map[string]string{
@@ -466,8 +466,8 @@ func TestStoreProductSoftDelete(t *testing.T) {
 	product := NewProduct().
 		SetStatus(PRODUCT_STATUS_DRAFT).
 		SetTitle("Ruler").
-		SetQuantity(1).
-		SetPrice(19.99).
+		SetQuantityInt(1).
+		SetPriceFloat(19.99).
 		SetMemo("test ruler")
 
 	err = store.ProductCreate(product)

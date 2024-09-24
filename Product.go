@@ -15,16 +15,20 @@ type Product struct {
 	dataobject.DataObject
 }
 
+// == INTERFACES ===============================================================
+
+var _ ProductInterface = (*Product)(nil)
+
 // == CONSTRUCTORS =============================================================
 
-func NewProduct() *Product {
+func NewProduct() ProductInterface {
 	o := (&Product{}).
 		SetID(uid.HumanUid()).
 		SetStatus(PRODUCT_STATUS_DRAFT).
 		SetTitle("").
 		SetDescription("").
-		SetQuantity(0). // By default 1
-		SetPrice(0).    // Free. By default
+		SetQuantityInt(0). // By default 1
+		SetPriceFloat(0).  // Free. By default
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
@@ -35,7 +39,7 @@ func NewProduct() *Product {
 	return o
 }
 
-func NewProductFromExistingData(data map[string]string) *Product {
+func NewProductFromExistingData(data map[string]string) ProductInterface {
 	o := &Product{}
 	o.Hydrate(data)
 	return o
@@ -65,7 +69,7 @@ func (product *Product) CreatedAtCarbon() carbon.Carbon {
 	return carbon.NewCarbon().Parse(product.CreatedAt(), carbon.UTC)
 }
 
-func (product *Product) SetCreatedAt(createdAt string) *Product {
+func (product *Product) SetCreatedAt(createdAt string) ProductInterface {
 	product.Set(COLUMN_CREATED_AT, createdAt)
 	return product
 }
@@ -78,7 +82,7 @@ func (product *Product) DeletedAtCarbon() carbon.Carbon {
 	return carbon.NewCarbon().Parse(product.DeletedAt(), carbon.UTC)
 }
 
-func (product *Product) SetDeletedAt(deletedAt string) *Product {
+func (product *Product) SetDeletedAt(deletedAt string) ProductInterface {
 	product.Set(COLUMN_DELETED_AT, deletedAt)
 	return product
 }
@@ -87,7 +91,7 @@ func (product *Product) ID() string {
 	return product.Get(COLUMN_ID)
 }
 
-func (product *Product) SetID(id string) *Product {
+func (product *Product) SetID(id string) ProductInterface {
 	product.Set(COLUMN_ID, id)
 	return product
 }
@@ -96,7 +100,7 @@ func (product *Product) Memo() string {
 	return product.Get(COLUMN_MEMO)
 }
 
-func (product *Product) SetMemo(memo string) *Product {
+func (product *Product) SetMemo(memo string) ProductInterface {
 	product.Set(COLUMN_MEMO, memo)
 	return product
 }
@@ -163,7 +167,7 @@ func (product *Product) Status() string {
 	return product.Get(COLUMN_STATUS)
 }
 
-func (product *Product) SetStatus(status string) *Product {
+func (product *Product) SetStatus(status string) ProductInterface {
 	product.Set(COLUMN_STATUS, status)
 	return product
 }
@@ -172,13 +176,18 @@ func (product *Product) Price() string {
 	return product.Get(COLUMN_PRICE)
 }
 
+func (product *Product) SetPrice(price string) ProductInterface {
+	product.Set(COLUMN_PRICE, price)
+	return product
+}
+
 func (product *Product) PriceFloat() float64 {
 	price, _ := utils.ToFloat(product.Get(COLUMN_PRICE))
 	return price
 }
 
-func (product *Product) SetPrice(price float64) *Product {
-	product.Set(COLUMN_PRICE, utils.ToString(price))
+func (product *Product) SetPriceFloat(price float64) ProductInterface {
+	product.SetPrice(utils.ToString(price))
 	return product
 }
 
@@ -186,13 +195,18 @@ func (product *Product) Quantity() string {
 	return product.Get(COLUMN_QUANTITY)
 }
 
+func (product *Product) SetQuantity(quantity string) ProductInterface {
+	product.Set(COLUMN_QUANTITY, quantity)
+	return product
+}
+
 func (product *Product) QuantityInt() int64 {
 	quantity, _ := utils.ToInt(product.Quantity())
 	return quantity
 }
 
-func (product *Product) SetQuantity(quantity int) *Product {
-	product.Set(COLUMN_QUANTITY, utils.ToString(quantity))
+func (product *Product) SetQuantityInt(quantity int64) ProductInterface {
+	product.SetQuantity(utils.ToString(quantity))
 	return product
 }
 
@@ -200,7 +214,7 @@ func (product *Product) Title() string {
 	return product.Get(COLUMN_TITLE)
 }
 
-func (product *Product) SetTitle(title string) *Product {
+func (product *Product) SetTitle(title string) ProductInterface {
 	product.Set(COLUMN_TITLE, title)
 	return product
 }
@@ -209,7 +223,7 @@ func (product *Product) Description() string {
 	return product.Get(COLUMN_DESCRIPTION)
 }
 
-func (product *Product) SetDescription(description string) *Product {
+func (product *Product) SetDescription(description string) ProductInterface {
 	product.Set(COLUMN_DESCRIPTION, description)
 	return product
 }
@@ -222,7 +236,7 @@ func (product *Product) UpdatedAtCarbon() carbon.Carbon {
 	return carbon.NewCarbon().Parse(product.UpdatedAt(), carbon.UTC)
 }
 
-func (product *Product) SetUpdatedAt(updatedAt string) *Product {
+func (product *Product) SetUpdatedAt(updatedAt string) ProductInterface {
 	product.Set(COLUMN_UPDATED_AT, updatedAt)
 	return product
 }

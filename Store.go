@@ -499,7 +499,7 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 	return q
 }
 
-func (store *Store) ProductCreate(product *Product) error {
+func (store *Store) ProductCreate(product ProductInterface) error {
 	product.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	product.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	product.SetDeletedAt(sb.NULL_DATETIME)
@@ -531,7 +531,7 @@ func (store *Store) ProductCreate(product *Product) error {
 	return nil
 }
 
-func (store *Store) ProductSoftDelete(product *Product) error {
+func (store *Store) ProductSoftDelete(product ProductInterface) error {
 	if product == nil {
 		return errors.New("product is empty")
 	}
@@ -551,7 +551,7 @@ func (store *Store) ProductSoftDeleteByID(id string) error {
 	return store.ProductSoftDelete(product)
 }
 
-func (store *Store) ProductFindByID(id string) (*Product, error) {
+func (store *Store) ProductFindByID(id string) (ProductInterface, error) {
 	if id == "" {
 		return nil, errors.New("product id is empty")
 	}
@@ -566,19 +566,19 @@ func (store *Store) ProductFindByID(id string) (*Product, error) {
 	}
 
 	if len(list) > 0 {
-		return &list[0], nil
+		return list[0], nil
 	}
 
 	return nil, nil
 }
 
-func (store *Store) ProductList(options ProductQueryOptions) ([]Product, error) {
+func (store *Store) ProductList(options ProductQueryOptions) ([]ProductInterface, error) {
 	q := store.productQuery(options)
 
 	sqlStr, _, errSql := q.Select().ToSQL()
 
 	if errSql != nil {
-		return []Product{}, nil
+		return []ProductInterface{}, nil
 	}
 
 	if store.debugEnabled {
@@ -588,20 +588,20 @@ func (store *Store) ProductList(options ProductQueryOptions) ([]Product, error) 
 	db := sb.NewDatabase(store.db, store.dbDriverName)
 	modelMaps, err := db.SelectToMapString(sqlStr)
 	if err != nil {
-		return []Product{}, err
+		return []ProductInterface{}, err
 	}
 
-	list := []Product{}
+	list := []ProductInterface{}
 
 	lo.ForEach(modelMaps, func(modelMap map[string]string, index int) {
 		model := NewProductFromExistingData(modelMap)
-		list = append(list, *model)
+		list = append(list, model)
 	})
 
 	return list, nil
 }
 
-func (store *Store) ProductUpdate(product *Product) error {
+func (store *Store) ProductUpdate(product ProductInterface) error {
 	if product == nil {
 		return errors.New("product is nil")
 	}
@@ -642,19 +642,19 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 	q := goqu.Dialect(store.dbDriverName).From(store.productTableName)
 
 	if options.ID != "" {
-		q = q.Where(goqu.C("id").Eq(options.ID))
+		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
 	if options.Title != "" {
-		q = q.Where(goqu.C("user_id").Eq(options.Title))
+		q = q.Where(goqu.C(COLUMN_TITLE).Eq(options.Title))
 	}
 
 	if options.Status != "" {
-		q = q.Where(goqu.C("status").Eq(options.Status))
+		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
 	}
 
 	if len(options.StatusIn) > 0 {
-		q = q.Where(goqu.C("status").In(options.StatusIn))
+		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
 	}
 
 	if !options.CountOnly {
@@ -667,7 +667,7 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 		}
 	}
 
-	sortOrder := "desc"
+	sortOrder := sb.DESC
 	if options.SortOrder != "" {
 		sortOrder = options.SortOrder
 	}
