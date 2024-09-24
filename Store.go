@@ -75,6 +75,45 @@ func (st *Store) EnableDebug(debug bool) {
 	st.debugEnabled = debug
 }
 
+func (store *Store) DiscountCount(options DiscountQueryOptions) (int64, error) {
+	options.CountOnly = true
+	q := store.discountQuery(options)
+
+	sqlStr, params, errSql := q.Prepared(true).
+		Limit(1).
+		Select(goqu.COUNT(goqu.Star()).As("count")).
+		ToSQL()
+
+	if errSql != nil {
+		return -1, nil
+	}
+
+	if store.debugEnabled {
+		log.Println(sqlStr)
+	}
+
+	db := sb.NewDatabase(store.db, store.dbDriverName)
+	mapped, err := db.SelectToMapString(sqlStr, params...)
+	if err != nil {
+		return -1, err
+	}
+
+	if len(mapped) < 1 {
+		return -1, nil
+	}
+
+	countStr := mapped[0]["count"]
+
+	i, err := strconv.ParseInt(countStr, 10, 64)
+
+	if err != nil {
+		return -1, err
+
+	}
+
+	return i, nil
+}
+
 func (store *Store) DiscountCreate(discount DiscountInterface) error {
 	discount.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
@@ -580,6 +619,45 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 	return q
 }
 
+func (store *Store) OrderLineItemCount(options OrderLineItemQueryOptions) (int64, error) {
+	options.CountOnly = true
+	q := store.orderLineItemQuery(options)
+
+	sqlStr, params, errSql := q.Prepared(true).
+		Limit(1).
+		Select(goqu.COUNT(goqu.Star()).As("count")).
+		ToSQL()
+
+	if errSql != nil {
+		return -1, nil
+	}
+
+	if store.debugEnabled {
+		log.Println(sqlStr)
+	}
+
+	db := sb.NewDatabase(store.db, store.dbDriverName)
+	mapped, err := db.SelectToMapString(sqlStr, params...)
+	if err != nil {
+		return -1, err
+	}
+
+	if len(mapped) < 1 {
+		return -1, nil
+	}
+
+	countStr := mapped[0]["count"]
+
+	i, err := strconv.ParseInt(countStr, 10, 64)
+
+	if err != nil {
+		return -1, err
+
+	}
+
+	return i, nil
+}
+
 func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) error {
 	orderLineItem.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	orderLineItem.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
@@ -797,6 +875,45 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 	}
 
 	return q
+}
+
+func (store *Store) ProductCount(options ProductQueryOptions) (int64, error) {
+	options.CountOnly = true
+	q := store.productQuery(options)
+
+	sqlStr, params, errSql := q.Prepared(true).
+		Limit(1).
+		Select(goqu.COUNT(goqu.Star()).As("count")).
+		ToSQL()
+
+	if errSql != nil {
+		return -1, nil
+	}
+
+	if store.debugEnabled {
+		log.Println(sqlStr)
+	}
+
+	db := sb.NewDatabase(store.db, store.dbDriverName)
+	mapped, err := db.SelectToMapString(sqlStr, params...)
+	if err != nil {
+		return -1, err
+	}
+
+	if len(mapped) < 1 {
+		return -1, nil
+	}
+
+	countStr := mapped[0]["count"]
+
+	i, err := strconv.ParseInt(countStr, 10, 64)
+
+	if err != nil {
+		return -1, err
+
+	}
+
+	return i, nil
 }
 
 func (store *Store) ProductCreate(product ProductInterface) error {
