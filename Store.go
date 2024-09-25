@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/doug-martin/goqu/v9"
+	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/golang-module/carbon/v2"
 	"github.com/gouniverse/sb"
 	"github.com/mingrammer/cfmt"
@@ -316,6 +317,10 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
+	if len(options.IDIn) > 0 {
+		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn))
+	}
+
 	if options.Status != "" {
 		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
 	}
@@ -326,6 +331,14 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 
 	if options.Code != "" {
 		q = q.Where(goqu.C(COLUMN_CODE).Eq(options.Code))
+	}
+
+	if options.CreatedAtGte != "" && options.CreatedAtLte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte, options.CreatedAtLte)))
+	} else if options.CreatedAtGte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte))
+	} else if options.CreatedAtLte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte))
 	}
 
 	if !options.CountOnly {
@@ -580,6 +593,10 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
+	if len(options.IDIn) > 0 {
+		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn))
+	}
+
 	if options.CustomerID != "" {
 		q = q.Where(goqu.C(COLUMN_CUSTOMER_ID).Eq(options.CustomerID))
 	}
@@ -590,6 +607,14 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 
 	if len(options.StatusIn) > 0 {
 		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
+	}
+
+	if options.CreatedAtGte != "" && options.CreatedAtLte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte, options.CreatedAtLte)))
+	} else if options.CreatedAtGte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte))
+	} else if options.CreatedAtLte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte))
 	}
 
 	if !options.CountOnly {
@@ -835,6 +860,10 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 
 	if options.ID != "" {
 		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
+	}
+
+	if len(options.IDIn) > 0 {
+		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn))
 	}
 
 	if options.OrderID != "" {
@@ -1105,6 +1134,10 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
 	}
 
+	if len(options.IDIn) > 0 {
+		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn))
+	}
+
 	if options.Title != "" {
 		q = q.Where(goqu.C(COLUMN_TITLE).Eq(options.Title))
 	}
@@ -1115,6 +1148,14 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 
 	if len(options.StatusIn) > 0 {
 		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
+	}
+
+	if options.CreatedAtGte != "" && options.CreatedAtLte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte, options.CreatedAtLte)))
+	} else if options.CreatedAtGte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte))
+	} else if options.CreatedAtLte != "" {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte))
 	}
 
 	if !options.CountOnly {
@@ -1151,31 +1192,35 @@ func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDatase
 }
 
 type DiscountQueryOptions struct {
-	ID          string
-	IDIn        []string
-	Status      string
-	StatusIn    []string
-	Code        string
-	Offset      int
-	Limit       int
-	SortOrder   string
-	OrderBy     string
-	CountOnly   bool
-	WithDeleted bool
+	ID           string
+	IDIn         []string
+	Status       string
+	StatusIn     []string
+	Code         string
+	CreatedAtGte string
+	CreatedAtLte string
+	Offset       int
+	Limit        int
+	SortOrder    string
+	OrderBy      string
+	CountOnly    bool
+	WithDeleted  bool
 }
 
 type OrderQueryOptions struct {
-	ID          string
-	IDIn        string
-	CustomerID  string
-	Status      string
-	StatusIn    []string
-	Offset      int
-	Limit       int
-	SortOrder   string
-	OrderBy     string
-	CountOnly   bool
-	WithDeleted bool
+	ID           string
+	IDIn         string
+	CustomerID   string
+	Status       string
+	StatusIn     []string
+	CreatedAtGte string
+	CreatedAtLte string
+	Offset       int
+	Limit        int
+	SortOrder    string
+	OrderBy      string
+	CountOnly    bool
+	WithDeleted  bool
 }
 
 type OrderLineItemQueryOptions struct {
@@ -1194,15 +1239,17 @@ type OrderLineItemQueryOptions struct {
 }
 
 type ProductQueryOptions struct {
-	ID          string
-	IDIn        string
-	Status      string
-	StatusIn    []string
-	Title       string
-	Offset      int
-	Limit       int
-	SortOrder   string
-	OrderBy     string
-	CountOnly   bool
-	WithDeleted bool
+	ID           string
+	IDIn         []string
+	Status       string
+	StatusIn     []string
+	Title        string
+	CreatedAtGte string
+	CreatedAtLte string
+	Offset       int
+	Limit        int
+	SortOrder    string
+	OrderBy      string
+	CountOnly    bool
+	WithDeleted  bool
 }
