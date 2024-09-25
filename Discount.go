@@ -107,6 +107,11 @@ func (d *Discount) DeletedAt() string {
 	return d.Get(COLUMN_DELETED_AT)
 }
 
+func (d *Discount) DeletedAtCarbon() carbon.Carbon {
+	deletedAt := d.DeletedAt()
+	return carbon.Parse(deletedAt)
+}
+
 func (d *Discount) SetDeletedAt(deletedAt string) DiscountInterface {
 	d.Set(COLUMN_DELETED_AT, deletedAt)
 	return d
