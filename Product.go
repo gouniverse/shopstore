@@ -27,7 +27,7 @@ func NewProduct() ProductInterface {
 		SetStatus(PRODUCT_STATUS_DRAFT).
 		SetTitle("").
 		SetDescription("").
-		SetQuantityInt(0). // By default 1
+		SetQuantityInt(0). // By default 0
 		SetPriceFloat(0).  // Free. By default
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
