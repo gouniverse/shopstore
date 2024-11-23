@@ -1,6 +1,10 @@
 package shopstore
 
-import "github.com/golang-module/carbon/v2"
+import (
+	"log/slog"
+
+	"github.com/golang-module/carbon/v2"
+)
 
 type DiscountInterface interface {
 	Data() map[string]string
@@ -206,7 +210,7 @@ type ProductInterface interface {
 
 type StoreInterface interface {
 	AutoMigrate() error
-	EnableDebug(debug bool)
+	EnableDebug(debug bool, sqlLogger ...*slog.Logger)
 
 	DiscountCount(options DiscountQueryOptions) (int64, error)
 	DiscountCreate(discount DiscountInterface) error

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 	"github.com/golang-module/carbon/v2"
 	"github.com/gouniverse/sb"
-	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 )
 
@@ -29,6 +29,18 @@ type Store struct {
 	timeoutSeconds         int64
 	automigrateEnabled     bool
 	debugEnabled           bool
+	sqlLogger              *slog.Logger
+}
+
+// logSql logs sql to the sql logger
+func (store *Store) logSql(sqlOperationType string, sql string, params ...interface{}) {
+	if !store.debugEnabled {
+		return
+	}
+
+	if store.sqlLogger != nil {
+		store.sqlLogger.Debug("sql: "+sqlOperationType, slog.String("sql", sql), slog.Any("params", params))
+	}
 }
 
 // AutoMigrate auto migrate
@@ -72,8 +84,17 @@ func (store *Store) AutoMigrate() error {
 }
 
 // EnableDebug - enables the debug option
-func (st *Store) EnableDebug(debug bool) {
-	st.debugEnabled = debug
+func (store *Store) EnableDebug(debug bool, sqlLogger ...*slog.Logger) {
+	store.debugEnabled = debug
+	if store.debugEnabled {
+		if len(sqlLogger) < 1 {
+			store.sqlLogger = slog.Default()
+			return
+		}
+		store.sqlLogger = sqlLogger[0]
+	} else {
+		store.sqlLogger = nil
+	}
 }
 
 func (store *Store) DiscountCount(options DiscountQueryOptions) (int64, error) {
@@ -430,9 +451,7 @@ func (store *Store) OrderCreate(order OrderInterface) error {
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("insert", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
@@ -527,9 +546,7 @@ func (store *Store) OrderList(options OrderQueryOptions) ([]OrderInterface, erro
 		return []OrderInterface{}, nil
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("select", sqlStr)
 
 	db := sb.NewDatabase(store.db, store.dbDriverName)
 	modelMaps, err := db.SelectToMapString(sqlStr)
@@ -575,9 +592,7 @@ func (store *Store) OrderUpdate(order OrderInterface) error {
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("update", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
@@ -706,9 +721,7 @@ func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) er
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("insert", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
@@ -732,9 +745,7 @@ func (store *Store) OrderLineItemDeleteByID(id string) error {
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("delete", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
@@ -770,13 +781,12 @@ func (store *Store) OrderLineItemList(options OrderLineItemQueryOptions) ([]Orde
 	q := store.orderLineItemQuery(options)
 
 	sqlStr, params, errSql := q.Prepared(true).ToSQL()
+
 	if errSql != nil {
 		return nil, errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("select", sqlStr, params...)
 
 	db := sb.NewDatabase(store.db, store.dbDriverName)
 
@@ -844,9 +854,7 @@ func (store *Store) OrderLineItemUpdate(orderLineItem OrderLineItemInterface) er
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("update", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
@@ -971,9 +979,7 @@ func (store *Store) ProductCreate(product ProductInterface) error {
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("insert", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
@@ -1068,9 +1074,7 @@ func (store *Store) ProductList(options ProductQueryOptions) ([]ProductInterface
 		return []ProductInterface{}, nil
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("select", sqlStr)
 
 	db := sb.NewDatabase(store.db, store.dbDriverName)
 	modelMaps, err := db.SelectToMapString(sqlStr)
@@ -1116,9 +1120,7 @@ func (store *Store) ProductUpdate(product ProductInterface) error {
 		return errSql
 	}
 
-	if store.debugEnabled {
-		cfmt.Infoln(sqlStr)
-	}
+	store.logSql("update", sqlStr, params...)
 
 	_, err := store.db.Exec(sqlStr, params...)
 
