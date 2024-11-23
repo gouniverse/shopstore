@@ -53,6 +53,7 @@ tasks:
   errcheck:install:
     desc: Install errcheck or update to latest
     cmds:
+      - echo "Installing/updating errcheck..."
       - go install github.com/kisielk/errcheck@latest
       - echo "Done!"
     silent: true
