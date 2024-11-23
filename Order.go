@@ -30,7 +30,7 @@ func NewOrder() OrderInterface {
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetDeletedAt(sb.MAX_DATETIME)
 
-	o.SetMetas(map[string]string{})
+	_ = o.SetMetas(map[string]string{})
 
 	return o
 }

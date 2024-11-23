@@ -10,20 +10,29 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func initDB(filepath string) *sql.DB {
-	os.Remove(filepath) // remove database
+func initDB(filepath string) (*sql.DB, error) {
+	err := os.Remove(filepath) // remove database
+
+	if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
+		return nil, err
+	}
+
 	dsn := filepath + "?parseTime=true"
 	db, err := sql.Open("sqlite", dsn)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
 
 func TestStoreDiscountCreate(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -54,7 +63,11 @@ func TestStoreDiscountCreate(t *testing.T) {
 }
 
 func TestStoreDiscountDelete(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -104,7 +117,11 @@ func TestStoreDiscountDelete(t *testing.T) {
 }
 
 func TestStoreDiscountDeleteByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -154,7 +171,11 @@ func TestStoreDiscountDeleteByID(t *testing.T) {
 }
 
 func TestStoreDiscountFindByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -247,7 +268,11 @@ func TestStoreDiscountFindByID(t *testing.T) {
 }
 
 func TestStoreDiscountSoftDelete(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -311,7 +336,11 @@ func TestStoreDiscountSoftDelete(t *testing.T) {
 }
 
 func TestStoreDiscountUpdate(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -369,7 +398,11 @@ func TestStoreDiscountUpdate(t *testing.T) {
 }
 
 func TestStoreOderCreate(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -394,10 +427,14 @@ func TestStoreOderCreate(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	order.SetMetas(map[string]string{
+	err = order.SetMetas(map[string]string{
 		"color": "green",
 		"size":  "xxl",
 	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	err = store.OrderCreate(order)
 	if err != nil {
@@ -406,7 +443,11 @@ func TestStoreOderCreate(t *testing.T) {
 }
 
 func TestStoreOderDelete(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -453,7 +494,11 @@ func TestStoreOderDelete(t *testing.T) {
 }
 
 func TestStoreOderDeleteByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -500,7 +545,11 @@ func TestStoreOderDeleteByID(t *testing.T) {
 }
 
 func TestStoreOrderFindByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -526,10 +575,14 @@ func TestStoreOrderFindByID(t *testing.T) {
 		SetPriceFloat(19.99).
 		SetMemo("test memo")
 
-	order.SetMetas(map[string]string{
+	err = order.SetMetas(map[string]string{
 		"color": "green",
 		"size":  "xxl",
 	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	err = store.OrderCreate(order)
 	if err != nil {
@@ -580,7 +633,11 @@ func TestStoreOrderFindByID(t *testing.T) {
 }
 
 func TestStoreOrderSoftDelete(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -651,7 +708,11 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 }
 
 func TestStoreOrderUpdate(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -704,7 +765,11 @@ func TestStoreOrderUpdate(t *testing.T) {
 }
 
 func TestStoreOrderLineItemCreate(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -736,7 +801,11 @@ func TestStoreOrderLineItemCreate(t *testing.T) {
 }
 
 func TestStoreOrderLineItemDelete(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -783,7 +852,11 @@ func TestStoreOrderLineItemDelete(t *testing.T) {
 }
 
 func TestStoreOrderLineItemFindByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -825,7 +898,11 @@ func TestStoreOrderLineItemFindByID(t *testing.T) {
 }
 
 func TestStoreOrderLineItemList(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -867,7 +944,11 @@ func TestStoreOrderLineItemList(t *testing.T) {
 }
 
 func TestStoreOrderLineItemSoftDeleteByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -927,7 +1008,11 @@ func TestStoreOrderLineItemSoftDeleteByID(t *testing.T) {
 }
 
 func TestStoreProductCreate(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -951,10 +1036,14 @@ func TestStoreProductCreate(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	product.SetMetas(map[string]string{
+	err = product.SetMetas(map[string]string{
 		"color": "green",
 		"size":  "xxl",
 	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	err = store.ProductCreate(product)
 	if err != nil {
@@ -963,7 +1052,11 @@ func TestStoreProductCreate(t *testing.T) {
 }
 
 func TestStoreProductFindByID(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
@@ -989,10 +1082,14 @@ func TestStoreProductFindByID(t *testing.T) {
 		SetPriceFloat(19.99).
 		SetMemo("test ruler")
 
-	product.SetMetas(map[string]string{
+	err = product.SetMetas(map[string]string{
 		"color": "green",
 		"size":  "xxl",
 	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	err = store.ProductCreate(product)
 	if err != nil {
@@ -1043,7 +1140,11 @@ func TestStoreProductFindByID(t *testing.T) {
 }
 
 func TestStoreProductSoftDelete(t *testing.T) {
-	db := initDB(":memory:")
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
