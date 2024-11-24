@@ -10,7 +10,6 @@ require (
 	github.com/gouniverse/sb v0.6.0
 	github.com/gouniverse/uid v1.5.0
 	github.com/gouniverse/utils v1.45.3
-	github.com/mingrammer/cfmt v1.1.0
 	github.com/samber/lo v1.47.0
 	modernc.org/sqlite v1.34.1
 )
@@ -36,6 +35,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mingrammer/cfmt v1.1.0 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
