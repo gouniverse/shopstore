@@ -1,7 +1,7 @@
 package shopstore
 
 import (
-	"github.com/golang-module/carbon/v2"
+	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/dataobject"
 	"github.com/gouniverse/maputils"
 	"github.com/gouniverse/sb"
