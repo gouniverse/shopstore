@@ -1,10 +1,57 @@
 package shopstore
 
 import (
+	"context"
 	"log/slog"
 
 	"github.com/dromara/carbon/v2"
 )
+
+type CategoryInterface interface {
+	Data() map[string]string
+	DataChanged() map[string]string
+	MarkAsNotDirty()
+
+	// Setters and Getters
+	CreatedAt() string
+	CreatedAtCarbon() carbon.Carbon
+	SetCreatedAt(createdAt string) CategoryInterface
+
+	Description() string
+	SetDescription(description string) CategoryInterface
+
+	ID() string
+	SetID(id string) CategoryInterface
+
+	Memo() string
+	SetMemo(memo string) CategoryInterface
+
+	Metas() (map[string]string, error)
+	Meta(name string) string
+	SetMeta(name string, value string) error
+	SetMetas(metas map[string]string) error
+	UpsertMetas(metas map[string]string) error
+
+	ParentID() string
+	SetParentID(parentID string) CategoryInterface
+
+	// Slug() string
+	// SetSlug(slug string) CatregoryInterface
+
+	Status() string
+	SetStatus(status string) CategoryInterface
+
+	Title() string
+	SetTitle(title string) CategoryInterface
+
+	SoftDeletedAt() string
+	SoftDeletedAtCarbon() carbon.Carbon
+	SetSoftDeletedAt(deletedAt string) CategoryInterface
+
+	UpdatedAt() string
+	UpdatedAtCarbon() carbon.Carbon
+	SetUpdatedAt(updatedAt string) CategoryInterface
+}
 
 type DiscountInterface interface {
 	Data() map[string]string
@@ -211,6 +258,16 @@ type ProductInterface interface {
 type StoreInterface interface {
 	AutoMigrate() error
 	EnableDebug(debug bool, sqlLogger ...*slog.Logger)
+
+	CategoryCount(context context.Context, options CategoryQueryInterface) (int64, error)
+	CategoryCreate(context context.Context, category CategoryInterface) error
+	CategoryDelete(context context.Context, category CategoryInterface) error
+	CategoryDeleteByID(context context.Context, categoryID string) error
+	CategoryFindByID(context context.Context, categoryID string) (CategoryInterface, error)
+	CategoryList(context context.Context, options CategoryQueryInterface) ([]CategoryInterface, error)
+	CategorySoftDelete(context context.Context, category CategoryInterface) error
+	CategorySoftDeleteByID(context context.Context, categoryID string) error
+	CategoryUpdate(contxt context.Context, category CategoryInterface) error
 
 	DiscountCount(options DiscountQueryOptions) (int64, error)
 	DiscountCreate(discount DiscountInterface) error

@@ -1,20 +1,24 @@
 package shopstore
 
 import (
+	"context"
 	"database/sql"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/gouniverse/base/database"
 	"github.com/gouniverse/sb"
 	_ "modernc.org/sqlite"
 )
 
 func initDB(filepath string) (*sql.DB, error) {
-	err := os.Remove(filepath) // remove database
+	if filepath != ":memory:" {
+		err := os.Remove(filepath) // remove database
 
-	if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
-		return nil, err
+		if err != nil && !strings.Contains(err.Error(), "no such file or directory") {
+			return nil, err
+		}
 	}
 
 	dsn := filepath + "?parseTime=true"
@@ -27,6 +31,421 @@ func initDB(filepath string) (*sql.DB, error) {
 	return db, nil
 }
 
+func TestStoreCategoryCreate(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	err = store.CategoryCreate(database.Context(context.Background(), db), category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+}
+
+func TestStoreCategoryDelete(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	ctx := database.Context(context.Background(), db)
+
+	err = store.CategoryCreate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.CategoryDelete(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.CategoryFindByID(ctx, category.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound != nil {
+		t.Fatal("unexpected category found")
+	}
+}
+
+func TestStoreCategoryDeleteByID(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	ctx := database.Context(context.Background(), db)
+
+	err = store.CategoryCreate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.CategoryDeleteByID(ctx, category.ID())
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.CategoryFindByID(ctx, category.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound != nil {
+		t.Fatal("unexpected category found")
+	}
+}
+
+func TestStoreCategoryFindByID(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	ctx := database.Context(context.Background(), db)
+
+	err = store.CategoryCreate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.CategoryFindByID(ctx, category.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound == nil {
+		t.Fatal("unexpected nil category")
+	}
+
+	if categoryFound.ID() != category.ID() {
+		t.Fatal("unexpected category id")
+	}
+
+	if categoryFound.Title() != category.Title() {
+		t.Fatal("unexpected category title")
+	}
+
+	if categoryFound.Status() != category.Status() {
+		t.Fatal("unexpected category status")
+	}
+
+	if categoryFound.ParentID() != category.ParentID() {
+		t.Fatal("unexpected category parent id")
+	}
+
+	if !strings.Contains(categoryFound.SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Exam MUST NOT be soft deleted", categoryFound.SoftDeletedAt())
+		return
+	}
+}
+
+func TestStoreCategorySoftDelete(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	ctx := database.Context(context.Background(), db)
+
+	err = store.CategoryCreate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.CategorySoftDelete(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.CategoryFindByID(ctx, category.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound != nil {
+		t.Fatal("category must be nil as it was soft deleted")
+	}
+
+	list, err := store.CategoryList(ctx, NewCategoryQuery().SetSoftDeletedIncluded(true))
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if len(list) < 1 {
+		t.Fatal("unexpected empty list")
+	}
+
+	if list[0].ID() != category.ID() {
+		t.Fatal("unexpected category id")
+	}
+
+	if strings.Contains(list[0].SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Category MUST be soft deleted, but found: ", list[0].SoftDeletedAt())
+		return
+	}
+}
+
+func TestStoreCategorySoftDeleteByID(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	ctx := database.Context(context.Background(), db)
+
+	err = store.CategoryCreate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.CategorySoftDeleteByID(ctx, category.ID())
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.CategoryFindByID(ctx, category.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound != nil {
+		t.Fatal("category must be nil as it was soft deleted")
+	}
+
+	list, err := store.CategoryList(ctx, NewCategoryQuery().SetSoftDeletedIncluded(true))
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if len(list) < 1 {
+		t.Fatal("unexpected empty list")
+	}
+
+	if list[0].ID() != category.ID() {
+		t.Fatal("unexpected category id")
+	}
+
+	if strings.Contains(list[0].SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Category MUST be soft deleted, but found: ", list[0].SoftDeletedAt())
+		return
+	}
+}
+
+func TestStoreCategoryUpdate(t *testing.T) {
+	db, err := initDB(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category_create",
+		DiscountTableName:      "shop_discount_create",
+		OrderTableName:         "shop_order_create",
+		OrderLineItemTableName: "shop_order_line_item_create",
+		ProductTableName:       "shop_product_create",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	category := NewCategory().
+		SetStatus(CATEGORY_STATUS_DRAFT).
+		SetTitle("CATEGORY_TITLE")
+
+	ctx := database.Context(context.Background(), db)
+
+	err = store.CategoryCreate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	category.SetTitle("CATEGORY_TITLE_UPDATED")
+
+	err = store.CategoryUpdate(ctx, category)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.CategoryFindByID(ctx, category.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound.Title() != "CATEGORY_TITLE_UPDATED" {
+		t.Fatal("unexpected category title: ", categoryFound.Title())
+	}
+}
+
 func TestStoreDiscountCreate(t *testing.T) {
 	db, err := initDB(":memory:")
 
@@ -36,6 +455,7 @@ func TestStoreDiscountCreate(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_create",
 		DiscountTableName:      "shop_discount_create",
 		OrderTableName:         "shop_order_create",
 		OrderLineItemTableName: "shop_order_line_item_create",
@@ -71,6 +491,7 @@ func TestStoreDiscountDelete(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_delete",
 		DiscountTableName:      "shop_discount_delete",
 		OrderTableName:         "shop_order_delete",
 		OrderLineItemTableName: "shop_order_line_item_delete",
@@ -125,6 +546,7 @@ func TestStoreDiscountDeleteByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_delete_by_id",
 		DiscountTableName:      "shop_discount_delete_by_id",
 		OrderTableName:         "shop_order_delete_by_id",
 		OrderLineItemTableName: "shop_order_line_item_delete_by_id",
@@ -179,6 +601,7 @@ func TestStoreDiscountFindByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_find_by_id",
 		DiscountTableName:      "shop_discount_find_by_id",
 		OrderTableName:         "shop_order_find_by_id",
 		OrderLineItemTableName: "shop_order_line_item_find_by_id",
@@ -276,6 +699,7 @@ func TestStoreDiscountSoftDelete(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_soft_delete",
 		DiscountTableName:      "shop_discount_soft_delete",
 		OrderTableName:         "shop_order_soft_delete",
 		OrderLineItemTableName: "shop_order_line_item_soft_delete",
@@ -344,6 +768,7 @@ func TestStoreDiscountUpdate(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_update",
 		DiscountTableName:      "shop_discount_update",
 		OrderTableName:         "shop_order_update",
 		OrderLineItemTableName: "shop_order_line_item_update",
@@ -406,6 +831,7 @@ func TestStoreOderCreate(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_create",
 		DiscountTableName:      "shop_discount_create",
 		OrderTableName:         "shop_order_create",
 		OrderLineItemTableName: "shop_order_line_item_create",
@@ -451,6 +877,7 @@ func TestStoreOderDelete(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_delete",
 		DiscountTableName:      "shop_discount_delete",
 		OrderTableName:         "shop_order_delete",
 		OrderLineItemTableName: "shop_order_line_item_delete",
@@ -502,6 +929,7 @@ func TestStoreOderDeleteByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_delete",
 		DiscountTableName:      "shop_discount_delete",
 		OrderTableName:         "shop_order_delete",
 		OrderLineItemTableName: "shop_order_line_item_delete",
@@ -553,6 +981,7 @@ func TestStoreOrderFindByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_find_by_id",
 		DiscountTableName:      "shop_discount_find_by_id",
 		OrderTableName:         "shop_order_find_by_id",
 		OrderLineItemTableName: "shop_order_line_item_find_by_id",
@@ -641,6 +1070,7 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_soft_delete",
 		DiscountTableName:      "shop_discount_soft_delete",
 		OrderTableName:         "shop_order_soft_delete",
 		OrderLineItemTableName: "shop_order_line_item_soft_delete",
@@ -716,6 +1146,7 @@ func TestStoreOrderUpdate(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_update",
 		DiscountTableName:      "shop_discount_update",
 		OrderTableName:         "shop_order_update",
 		OrderLineItemTableName: "shop_order_line_item_update",
@@ -773,6 +1204,7 @@ func TestStoreOrderLineItemCreate(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_create",
 		DiscountTableName:      "shop_discount_create",
 		OrderTableName:         "shop_order_create",
 		OrderLineItemTableName: "shop_order_line_item_create",
@@ -809,6 +1241,7 @@ func TestStoreOrderLineItemDelete(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_delete",
 		DiscountTableName:      "shop_discount_delete",
 		OrderTableName:         "shop_order_delete",
 		OrderLineItemTableName: "shop_order_line_item_delete",
@@ -860,6 +1293,7 @@ func TestStoreOrderLineItemFindByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_create",
 		DiscountTableName:      "shop_discount_create",
 		OrderTableName:         "shop_order_create",
 		OrderLineItemTableName: "shop_order_line_item_create",
@@ -906,6 +1340,7 @@ func TestStoreOrderLineItemList(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_create",
 		DiscountTableName:      "shop_discount_create",
 		OrderTableName:         "shop_order_create",
 		OrderLineItemTableName: "shop_order_line_item_create",
@@ -952,6 +1387,7 @@ func TestStoreOrderLineItemSoftDeleteByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_soft_delete",
 		DiscountTableName:      "shop_discount_soft_delete",
 		OrderTableName:         "shop_order_soft_delete",
 		OrderLineItemTableName: "shop_order_line_item_soft_delete",
@@ -1016,6 +1452,7 @@ func TestStoreProductCreate(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_create",
 		DiscountTableName:      "shop_discount_create",
 		OrderTableName:         "shop_order_create",
 		OrderLineItemTableName: "shop_order_line_item_create",
@@ -1060,6 +1497,7 @@ func TestStoreProductFindByID(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_find_by_id",
 		DiscountTableName:      "shop_discount_find_by_id",
 		OrderTableName:         "shop_order_find_by_id",
 		OrderLineItemTableName: "shop_order_line_item_find_by_id",
@@ -1148,6 +1586,7 @@ func TestStoreProductSoftDelete(t *testing.T) {
 
 	store, err := NewStore(NewStoreOptions{
 		DB:                     db,
+		CategoryTableName:      "shop_category_soft_delete",
 		DiscountTableName:      "shop_discount_soft_delete",
 		OrderTableName:         "shop_order_soft_delete",
 		OrderLineItemTableName: "shop_order_line_item_soft_delete",

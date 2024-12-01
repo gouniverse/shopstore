@@ -9,6 +9,7 @@ import (
 
 // NewStoreOptions define the options for creating a new block store
 type NewStoreOptions struct {
+	CategoryTableName      string
 	DiscountTableName      string
 	OrderTableName         string
 	OrderLineItemTableName string
@@ -21,6 +22,10 @@ type NewStoreOptions struct {
 
 // NewStore creates a new block store
 func NewStore(opts NewStoreOptions) (*Store, error) {
+	if opts.CategoryTableName == "" {
+		return nil, errors.New("shop store: CategoryTableName is required")
+	}
+
 	if opts.DiscountTableName == "" {
 		return nil, errors.New("shop store: DiscountTableName is required")
 	}
@@ -46,6 +51,7 @@ func NewStore(opts NewStoreOptions) (*Store, error) {
 	}
 
 	store := &Store{
+		categoryTableName:      opts.CategoryTableName,
 		discountTableName:      opts.DiscountTableName,
 		orderTableName:         opts.OrderTableName,
 		orderLineItemTableName: opts.OrderLineItemTableName,

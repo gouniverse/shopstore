@@ -1,5 +1,9 @@
 package shopstore
 
+const CATEGORY_STATUS_ACTIVE = "active"
+const CATEGORY_STATUS_DRAFT = "draft"
+const CATEGORY_STATUS_INACTIVE = "inactive"
+
 const COLUMN_AMOUNT = "amount"
 const COLUMN_CODE = "code"
 const COLUMN_CREATED_AT = "created_at"
@@ -11,9 +15,11 @@ const COLUMN_ID = "id"
 const COLUMN_MEMO = "memo"
 const COLUMN_METAS = "metas"
 const COLUMN_ORDER_ID = "order_id"
+const COLUMN_PARENT_ID = "parent_id"
 const COLUMN_PRICE = "price"
 const COLUMN_PRODUCT_ID = "product_id"
 const COLUMN_QUANTITY = "quantity"
+const COLUMN_SOFT_DELETED_AT = "soft_deleted_at"
 const COLUMN_STARTS_AT = "starts_at"
 const COLUMN_STATUS = "status"
 const COLUMN_TYPE = "type"
