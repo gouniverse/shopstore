@@ -7,6 +7,7 @@ import (
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/uid"
 	"github.com/gouniverse/utils"
+	"github.com/spf13/cast"
 )
 
 // == CLASS ====================================================================
@@ -57,6 +58,14 @@ func (product *Product) IsDisabled() bool {
 
 func (product *Product) IsDraft() bool {
 	return product.Status() == PRODUCT_STATUS_DRAFT
+}
+
+func (product *Product) IsSoftDeleted() bool {
+	return product.DeletedAtCarbon().Compare("<", carbon.Now(carbon.UTC))
+}
+
+func (product *Product) IsFree() bool {
+	return cast.ToInt(product.Price()) == 0
 }
 
 // == GETTERS & SETTERS ========================================================
