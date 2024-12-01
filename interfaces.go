@@ -210,6 +210,16 @@ type ProductInterface interface {
 	DataChanged() map[string]string
 	MarkAsNotDirty()
 
+	// Methods
+
+	IsActive() bool
+	IsDisabled() bool
+	IsDraft() bool
+	IsSoftDeleted() bool
+	IsFree() bool
+
+	// Setters and Getters
+
 	CreatedAt() string
 	CreatedAtCarbon() carbon.Carbon
 	SetCreatedAt(createdAt string) ProductInterface
