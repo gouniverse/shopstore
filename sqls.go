@@ -121,6 +121,73 @@ func (st *Store) sqlDiscountTableCreate() string {
 	return sql
 }
 
+func (store *Store) sqlMediaTableCreate() string {
+	sql := sb.NewBuilder(sb.DatabaseDriverName(store.db)).
+		Table(store.mediaTableName).
+		Column(sb.Column{
+			Name:       COLUMN_ID,
+			Type:       sb.COLUMN_TYPE_STRING,
+			Length:     40,
+			PrimaryKey: true,
+		}).
+		Column(sb.Column{
+			Name:   COLUMN_STATUS,
+			Type:   sb.COLUMN_TYPE_STRING,
+			Length: 20,
+		}).
+		Column(sb.Column{
+			Name:   COLUMN_ENTITY_ID,
+			Type:   sb.COLUMN_TYPE_STRING,
+			Length: 40,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_SEQUENCE,
+			Type: sb.COLUMN_TYPE_INTEGER,
+		}).
+		Column(sb.Column{
+			Name:   COLUMN_MEDIA_TYPE,
+			Type:   sb.COLUMN_TYPE_STRING,
+			Length: 20,
+		}).
+		Column(sb.Column{
+			Name:   COLUMN_MEDIA_URL,
+			Type:   sb.COLUMN_TYPE_STRING,
+			Length: 510,
+		}).
+		Column(sb.Column{
+			Name:   COLUMN_TITLE,
+			Type:   sb.COLUMN_TYPE_STRING,
+			Length: 255,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_DESCRIPTION,
+			Type: sb.COLUMN_TYPE_TEXT,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_MEMO,
+			Type: sb.COLUMN_TYPE_TEXT,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_METAS,
+			Type: sb.COLUMN_TYPE_TEXT,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_CREATED_AT,
+			Type: sb.COLUMN_TYPE_DATETIME,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_UPDATED_AT,
+			Type: sb.COLUMN_TYPE_DATETIME,
+		}).
+		Column(sb.Column{
+			Name: COLUMN_SOFT_DELETED_AT,
+			Type: sb.COLUMN_TYPE_DATETIME,
+		}).
+		CreateIfNotExists()
+
+	return sql
+}
+
 func (store *Store) sqlOrderLineItemTableCreate() string {
 	sql := sb.NewBuilder(sb.DatabaseDriverName(store.db)).
 		Table(store.orderLineItemTableName).

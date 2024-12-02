@@ -11,6 +11,7 @@ import (
 type NewStoreOptions struct {
 	CategoryTableName      string
 	DiscountTableName      string
+	MediaTableName         string
 	OrderTableName         string
 	OrderLineItemTableName string
 	ProductTableName       string
@@ -53,6 +54,7 @@ func NewStore(opts NewStoreOptions) (*Store, error) {
 	store := &Store{
 		categoryTableName:      opts.CategoryTableName,
 		discountTableName:      opts.DiscountTableName,
+		mediaTableName:         opts.MediaTableName,
 		orderTableName:         opts.OrderTableName,
 		orderLineItemTableName: opts.OrderLineItemTableName,
 		productTableName:       opts.ProductTableName,

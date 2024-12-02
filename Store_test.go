@@ -3,6 +3,7 @@ package shopstore
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -29,6 +30,35 @@ func initDB(filepath string) (*sql.DB, error) {
 	}
 
 	return db, nil
+}
+
+func initStore(filepath string) (StoreInterface, error) {
+	db, err := initDB(filepath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	store, err := NewStore(NewStoreOptions{
+		DB:                     db,
+		CategoryTableName:      "shop_category",
+		DiscountTableName:      "shop_discount",
+		MediaTableName:         "shop_media",
+		OrderTableName:         "shop_order",
+		OrderLineItemTableName: "shop_order_line_item",
+		ProductTableName:       "shop_product",
+		AutomigrateEnabled:     true,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if store == nil {
+		return nil, errors.New("unexpected nil store")
+	}
+
+	return store, nil
 }
 
 func TestStoreCategoryCreate(t *testing.T) {
@@ -825,6 +855,352 @@ func TestStoreDiscountUpdate(t *testing.T) {
 
 	if discountFound.Title() != "DISCOUNT_TITLE_UPDATED" {
 		t.Fatal("Discount title MUST BE 'DISCOUNT_TITLE_UPDATED', found: ", discountFound.Title())
+	}
+}
+
+func TestStoreMediaCreate(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := context.Background()
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+}
+
+func TestStoreMediaDelete(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := context.Background()
+
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.MediaDelete(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	categoryFound, errFind := store.MediaFindByID(ctx, media.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if categoryFound != nil {
+		t.Fatal("unexpected media found")
+	}
+}
+
+func TestStoreMediaDeleteByID(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := database.Context(context.Background(), store.DB())
+
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.MediaDeleteByID(ctx, media.ID())
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	mediaFound, errFind := store.MediaFindByID(ctx, media.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if mediaFound != nil {
+		t.Fatal("unexpected media found")
+	}
+}
+
+func TestStoreMediaFindByID(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := database.Context(context.Background(), store.DB())
+
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	mediaFound, errFind := store.MediaFindByID(ctx, media.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if mediaFound == nil {
+		t.Fatal("unexpected nil media")
+	}
+
+	if mediaFound.ID() != media.ID() {
+		t.Fatal("unexpected media id")
+	}
+
+	if mediaFound.Title() != media.Title() {
+		t.Fatal("unexpected media title")
+	}
+
+	if mediaFound.Status() != media.Status() {
+		t.Fatal("unexpected category status")
+	}
+
+	if mediaFound.EntityID() != media.EntityID() {
+		t.Fatal("unexpected category parent id")
+	}
+
+	if !strings.Contains(mediaFound.SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Exam MUST NOT be soft deleted", mediaFound.SoftDeletedAt())
+		return
+	}
+}
+
+func TestStoreMediaSoftDelete(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := database.Context(context.Background(), store.DB())
+
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.MediaSoftDelete(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	mediaFound, errFind := store.MediaFindByID(ctx, media.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if mediaFound != nil {
+		t.Fatal("media must be nil as it was soft deleted")
+	}
+
+	list, err := store.MediaList(ctx, NewMediaQuery().SetSoftDeletedIncluded(true))
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if len(list) < 1 {
+		t.Fatal("unexpected empty list")
+	}
+
+	if list[0].ID() != media.ID() {
+		t.Fatal("unexpected media id")
+	}
+
+	if strings.Contains(list[0].SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Media MUST be soft deleted, but found: ", list[0].SoftDeletedAt())
+		return
+	}
+}
+
+func TestStoreMediaSoftDeleteByID(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := database.Context(context.Background(), store.DB())
+
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	err = store.MediaSoftDeleteByID(ctx, media.ID())
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	mediaFound, errFind := store.MediaFindByID(ctx, media.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if mediaFound != nil {
+		t.Fatal("category must be nil as it was soft deleted")
+	}
+
+	list, err := store.MediaList(ctx, NewMediaQuery().SetSoftDeletedIncluded(true))
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if len(list) < 1 {
+		t.Fatal("unexpected empty list")
+	}
+
+	if list[0].ID() != media.ID() {
+		t.Fatal("unexpected media id")
+	}
+
+	if strings.Contains(list[0].SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Media MUST be soft deleted, but found: ", list[0].SoftDeletedAt())
+		return
+	}
+}
+
+func TestStoreMediaUpdate(t *testing.T) {
+	store, err := initStore(":memory:")
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	if store == nil {
+		t.Fatal("unexpected nil store")
+	}
+
+	media := NewMedia().
+		SetStatus(MEDIA_STATUS_DRAFT).
+		SetEntityID("ENTITY_O1").
+		SetTitle("MEDIA_TITLE").
+		SetURL("https://example.com/image.jpg").
+		SetType(MEDIA_TYPE_IMAGE_JPG).
+		SetSequence(1)
+
+	ctx := database.Context(context.Background(), store.DB())
+
+	err = store.MediaCreate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	media.SetTitle("MEDIA_TITLE_UPDATED")
+
+	err = store.MediaUpdate(ctx, media)
+
+	if err != nil {
+		t.Fatal("unexpected error:", err)
+	}
+
+	mediaFound, errFind := store.MediaFindByID(ctx, media.ID())
+
+	if errFind != nil {
+		t.Fatal("unexpected error:", errFind)
+	}
+
+	if mediaFound.Title() != "MEDIA_TITLE_UPDATED" {
+		t.Fatal("unexpected media title: ", mediaFound.Title())
 	}
 }
 

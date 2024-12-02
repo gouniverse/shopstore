@@ -14,6 +14,7 @@ type CategoryInterface interface {
 	MarkAsNotDirty()
 
 	// Setters and Getters
+
 	CreatedAt() string
 	CreatedAtCarbon() carbon.Carbon
 	SetCreatedAt(createdAt string) CategoryInterface
@@ -59,6 +60,8 @@ type DiscountInterface interface {
 	DataChanged() map[string]string
 	MarkAsNotDirty()
 
+	// Setters and Getters
+
 	Amount() float64
 	SetAmount(amount float64) DiscountInterface
 	Code() string
@@ -88,6 +91,59 @@ type DiscountInterface interface {
 	UpdatedAt() string
 	UpdatedAtCarbon() carbon.Carbon
 	SetUpdatedAt(updatedAt string) DiscountInterface
+}
+
+type MediaInterface interface {
+	Data() map[string]string
+	DataChanged() map[string]string
+	MarkAsNotDirty()
+
+	// Setters and Getters
+
+	CreatedAt() string
+	CreatedAtCarbon() carbon.Carbon
+	SetCreatedAt(createdAt string) MediaInterface
+
+	Description() string
+	SetDescription(description string) MediaInterface
+
+	EntityID() string
+	SetEntityID(entityID string) MediaInterface
+
+	ID() string
+	SetID(id string) MediaInterface
+
+	Memo() string
+	SetMemo(memo string) MediaInterface
+
+	Metas() (map[string]string, error)
+	Meta(name string) string
+	SetMeta(name string, value string) error
+	SetMetas(metas map[string]string) error
+	UpsertMetas(metas map[string]string) error
+
+	Sequence() int
+	SetSequence(sequence int) MediaInterface
+
+	SoftDeletedAt() string
+	SoftDeletedAtCarbon() carbon.Carbon
+	SetSoftDeletedAt(softDeletedAt string) MediaInterface
+
+	Status() string
+	SetStatus(status string) MediaInterface
+
+	Title() string
+	SetTitle(title string) MediaInterface
+
+	Type() string
+	SetType(type_ string) MediaInterface
+
+	URL() string
+	SetURL(url string) MediaInterface
+
+	UpdatedAt() string
+	UpdatedAtCarbon() carbon.Carbon
+	SetUpdatedAt(updatedAt string) MediaInterface
 }
 
 type OrderInterface interface {
@@ -291,6 +347,16 @@ type StoreInterface interface {
 	DiscountSoftDelete(ctx context.Context, discount DiscountInterface) error
 	DiscountSoftDeleteByID(ctx context.Context, discountID string) error
 	DiscountUpdate(ctx context.Context, discount DiscountInterface) error
+
+	MediaCount(ctx context.Context, options MediaQueryInterface) (int64, error)
+	MediaCreate(ctx context.Context, media MediaInterface) error
+	MediaDelete(ctx context.Context, media MediaInterface) error
+	MediaDeleteByID(ctx context.Context, mediaID string) error
+	MediaFindByID(ctx context.Context, mediaID string) (MediaInterface, error)
+	MediaList(ctx context.Context, options MediaQueryInterface) ([]MediaInterface, error)
+	MediaSoftDelete(ctx context.Context, media MediaInterface) error
+	MediaSoftDeleteByID(ctx context.Context, mediaID string) error
+	MediaUpdate(ctx context.Context, media MediaInterface) error
 
 	OrderCount(ctx context.Context, options OrderQueryOptions) (int64, error)
 	OrderCreate(ctx context.Context, order OrderInterface) error
