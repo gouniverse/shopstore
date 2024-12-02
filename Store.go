@@ -65,6 +65,10 @@ func (store *Store) AutoMigrate() error {
 	return nil
 }
 
+func (store *Store) DB() *sql.DB {
+	return store.db
+}
+
 // EnableDebug - enables the debug option
 func (store *Store) EnableDebug(debug bool, sqlLogger ...*slog.Logger) {
 	store.debugEnabled = debug
@@ -79,7 +83,7 @@ func (store *Store) EnableDebug(debug bool, sqlLogger ...*slog.Logger) {
 	}
 }
 
-func (store *Store) CategoryCount(context context.Context, options CategoryQueryInterface) (int64, error) {
+func (store *Store) CategoryCount(ctx context.Context, options CategoryQueryInterface) (int64, error) {
 	options.SetCountOnly(true)
 
 	q, _, err := store.categoryQuery(options)
@@ -99,8 +103,8 @@ func (store *Store) CategoryCount(context context.Context, options CategoryQuery
 
 	store.logSql("select", sqlStr, params...)
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	mapped, err := db.SelectToMapString(sqlStr, params...)
+	mapped, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
+
 	if err != nil {
 		return -1, err
 	}
@@ -121,7 +125,11 @@ func (store *Store) CategoryCount(context context.Context, options CategoryQuery
 	return i, nil
 }
 
-func (store *Store) CategoryCreate(context context.Context, category CategoryInterface) error {
+func (store *Store) CategoryCreate(ctx context.Context, category CategoryInterface) error {
+	if category == nil {
+		return errors.New("category is nil")
+	}
+
 	category.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	category.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	category.SetSoftDeletedAt(sb.MAX_DATETIME)
@@ -140,7 +148,7 @@ func (store *Store) CategoryCreate(context context.Context, category CategoryInt
 
 	store.logSql("insert", sqlStr, params...)
 
-	_, err := database.Execute(store.toQuerableContext(context), sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -149,15 +157,15 @@ func (store *Store) CategoryCreate(context context.Context, category CategoryInt
 	return nil
 }
 
-func (store *Store) CategoryDelete(context context.Context, category CategoryInterface) error {
+func (store *Store) CategoryDelete(ctx context.Context, category CategoryInterface) error {
 	if category == nil {
 		return errors.New("category is nil")
 	}
 
-	return store.CategoryDeleteByID(context, category.ID())
+	return store.CategoryDeleteByID(ctx, category.ID())
 }
 
-func (store *Store) CategoryDeleteByID(context context.Context, id string) error {
+func (store *Store) CategoryDeleteByID(ctx context.Context, id string) error {
 	if id == "" {
 		return errors.New("id is empty")
 	}
@@ -173,7 +181,7 @@ func (store *Store) CategoryDeleteByID(context context.Context, id string) error
 
 	store.logSql("delete", sqlStr, params...)
 
-	_, err := database.Execute(store.toQuerableContext(context), sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -182,14 +190,14 @@ func (store *Store) CategoryDeleteByID(context context.Context, id string) error
 	return nil
 }
 
-func (store *Store) CategoryFindByID(context context.Context, id string) (CategoryInterface, error) {
+func (store *Store) CategoryFindByID(ctx context.Context, id string) (CategoryInterface, error) {
 	if id == "" {
 		return nil, errors.New("id is empty")
 	}
 
 	q := NewCategoryQuery().SetID(id).SetLimit(1)
 
-	list, err := store.CategoryList(context, q)
+	list, err := store.CategoryList(ctx, q)
 
 	if err != nil {
 		return nil, err
@@ -202,7 +210,7 @@ func (store *Store) CategoryFindByID(context context.Context, id string) (Catego
 	return list[0], nil
 }
 
-func (store *Store) CategoryList(context context.Context, options CategoryQueryInterface) ([]CategoryInterface, error) {
+func (store *Store) CategoryList(ctx context.Context, options CategoryQueryInterface) ([]CategoryInterface, error) {
 	err := options.Validate()
 
 	if err != nil {
@@ -225,7 +233,7 @@ func (store *Store) CategoryList(context context.Context, options CategoryQueryI
 
 	store.logSql("select", sqlStr, params...)
 
-	modelMaps, err := database.SelectToMapString(store.toQuerableContext(context), sqlStr, params...)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return nil, err
@@ -241,22 +249,22 @@ func (store *Store) CategoryList(context context.Context, options CategoryQueryI
 	return list, nil
 }
 
-func (store *Store) CategorySoftDelete(context context.Context, category CategoryInterface) error {
+func (store *Store) CategorySoftDelete(ctx context.Context, category CategoryInterface) error {
 	if category == nil {
 		return errors.New("category is nil")
 	}
 
 	category.SetSoftDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
-	return store.CategoryUpdate(context, category)
+	return store.CategoryUpdate(ctx, category)
 }
 
-func (store *Store) CategorySoftDeleteByID(context context.Context, id string) error {
+func (store *Store) CategorySoftDeleteByID(ctx context.Context, id string) error {
 	if id == "" {
 		return errors.New("id is empty")
 	}
 
-	category, err := store.CategoryFindByID(context, id)
+	category, err := store.CategoryFindByID(ctx, id)
 
 	if err != nil {
 		return err
@@ -266,10 +274,10 @@ func (store *Store) CategorySoftDeleteByID(context context.Context, id string) e
 		return nil
 	}
 
-	return store.CategorySoftDelete(context, category)
+	return store.CategorySoftDelete(ctx, category)
 }
 
-func (store *Store) CategoryUpdate(context context.Context, category CategoryInterface) (err error) {
+func (store *Store) CategoryUpdate(ctx context.Context, category CategoryInterface) (err error) {
 	if category == nil {
 		return errors.New("category is nil")
 	}
@@ -301,7 +309,7 @@ func (store *Store) CategoryUpdate(context context.Context, category CategoryInt
 		log.Println(sqlStr)
 	}
 
-	_, err = database.Execute(store.toQuerableContext(context), sqlStr, params...)
+	_, err = database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -313,7 +321,7 @@ func (store *Store) CategoryUpdate(context context.Context, category CategoryInt
 
 }
 
-func (store *Store) DiscountCount(options DiscountQueryOptions) (int64, error) {
+func (store *Store) DiscountCount(ctx context.Context, options DiscountQueryOptions) (int64, error) {
 	options.CountOnly = true
 	q := store.discountQuery(options)
 
@@ -330,8 +338,8 @@ func (store *Store) DiscountCount(options DiscountQueryOptions) (int64, error) {
 		log.Println(sqlStr)
 	}
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	mapped, err := db.SelectToMapString(sqlStr, params...)
+	mapped, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
+
 	if err != nil {
 		return -1, err
 	}
@@ -352,7 +360,7 @@ func (store *Store) DiscountCount(options DiscountQueryOptions) (int64, error) {
 	return i, nil
 }
 
-func (store *Store) DiscountCreate(discount DiscountInterface) error {
+func (store *Store) DiscountCreate(ctx context.Context, discount DiscountInterface) error {
 	discount.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	discount.SetDeletedAt(sb.MAX_DATETIME)
@@ -373,7 +381,7 @@ func (store *Store) DiscountCreate(discount DiscountInterface) error {
 		log.Println(sqlStr)
 	}
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -384,15 +392,15 @@ func (store *Store) DiscountCreate(discount DiscountInterface) error {
 	return nil
 }
 
-func (store *Store) DiscountDelete(discount DiscountInterface) error {
+func (store *Store) DiscountDelete(ctx context.Context, discount DiscountInterface) error {
 	if discount == nil {
 		return errors.New("discount is nil")
 	}
 
-	return store.DiscountDeleteByID(discount.ID())
+	return store.DiscountDeleteByID(ctx, discount.ID())
 }
 
-func (store *Store) DiscountDeleteByID(id string) error {
+func (store *Store) DiscountDeleteByID(ctx context.Context, id string) error {
 	if id == "" {
 		return errors.New("discount id is empty")
 	}
@@ -411,17 +419,17 @@ func (store *Store) DiscountDeleteByID(id string) error {
 		log.Println(sqlStr)
 	}
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	return err
 }
 
-func (store *Store) DiscountFindByID(id string) (DiscountInterface, error) {
+func (store *Store) DiscountFindByID(ctx context.Context, id string) (DiscountInterface, error) {
 	if id == "" {
 		return nil, errors.New("discount id is empty")
 	}
 
-	list, err := store.DiscountList(DiscountQueryOptions{
+	list, err := store.DiscountList(ctx, DiscountQueryOptions{
 		ID:    id,
 		Limit: 1,
 	})
@@ -437,12 +445,12 @@ func (store *Store) DiscountFindByID(id string) (DiscountInterface, error) {
 	return nil, nil
 }
 
-func (store *Store) DiscountFindByCode(code string) (DiscountInterface, error) {
+func (store *Store) DiscountFindByCode(ctx context.Context, code string) (DiscountInterface, error) {
 	if code == "" {
 		return nil, errors.New("discount code is empty")
 	}
 
-	list, err := store.DiscountList(DiscountQueryOptions{
+	list, err := store.DiscountList(ctx, DiscountQueryOptions{
 		Status: DISCOUNT_STATUS_ACTIVE,
 		Code:   code,
 		Limit:  1,
@@ -459,7 +467,7 @@ func (store *Store) DiscountFindByCode(code string) (DiscountInterface, error) {
 	return nil, nil
 }
 
-func (store *Store) DiscountList(options DiscountQueryOptions) ([]DiscountInterface, error) {
+func (store *Store) DiscountList(ctx context.Context, options DiscountQueryOptions) ([]DiscountInterface, error) {
 	q := store.discountQuery(options)
 
 	sqlStr, _, errSql := q.Select().ToSQL()
@@ -472,8 +480,8 @@ func (store *Store) DiscountList(options DiscountQueryOptions) ([]DiscountInterf
 		log.Println(sqlStr)
 	}
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	modelMaps, err := db.SelectToMapString(sqlStr)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr)
+
 	if err != nil {
 		return []DiscountInterface{}, err
 	}
@@ -488,27 +496,27 @@ func (store *Store) DiscountList(options DiscountQueryOptions) ([]DiscountInterf
 	return list, nil
 }
 
-func (store *Store) DiscountSoftDelete(discount DiscountInterface) error {
+func (store *Store) DiscountSoftDelete(ctx context.Context, discount DiscountInterface) error {
 	if discount == nil {
 		return errors.New("discount is nil")
 	}
 
 	discount.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
-	return store.DiscountUpdate(discount)
+	return store.DiscountUpdate(ctx, discount)
 }
 
-func (store *Store) DiscountSoftDeleteByID(id string) error {
-	discount, err := store.DiscountFindByID(id)
+func (store *Store) DiscountSoftDeleteByID(ctx context.Context, id string) error {
+	discount, err := store.DiscountFindByID(ctx, id)
 
 	if err != nil {
 		return err
 	}
 
-	return store.DiscountSoftDelete(discount)
+	return store.DiscountSoftDelete(ctx, discount)
 }
 
-func (store *Store) DiscountUpdate(discount DiscountInterface) error {
+func (store *Store) DiscountUpdate(ctx context.Context, discount DiscountInterface) error {
 	if discount == nil {
 		return errors.New("discount is nil")
 	}
@@ -540,7 +548,7 @@ func (store *Store) DiscountUpdate(discount DiscountInterface) error {
 		log.Println(sqlStr)
 	}
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	discount.MarkAsNotDirty()
 
@@ -658,7 +666,7 @@ func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectData
 	return q.Where(softDeleted)
 }
 
-func (store *Store) OrderCount(options OrderQueryOptions) (int64, error) {
+func (store *Store) OrderCount(ctx context.Context, options OrderQueryOptions) (int64, error) {
 	options.CountOnly = true
 	q := store.orderQuery(options)
 
@@ -675,8 +683,8 @@ func (store *Store) OrderCount(options OrderQueryOptions) (int64, error) {
 		log.Println(sqlStr)
 	}
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	mapped, err := db.SelectToMapString(sqlStr, params...)
+	mapped, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
+
 	if err != nil {
 		return -1, err
 	}
@@ -697,7 +705,7 @@ func (store *Store) OrderCount(options OrderQueryOptions) (int64, error) {
 	return i, nil
 }
 
-func (store *Store) OrderCreate(order OrderInterface) error {
+func (store *Store) OrderCreate(ctx context.Context, order OrderInterface) error {
 	order.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	order.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	order.SetDeletedAt(sb.MAX_DATETIME)
@@ -716,7 +724,7 @@ func (store *Store) OrderCreate(order OrderInterface) error {
 
 	store.logSql("insert", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -727,15 +735,15 @@ func (store *Store) OrderCreate(order OrderInterface) error {
 	return nil
 }
 
-func (store *Store) OrderDelete(order OrderInterface) error {
+func (store *Store) OrderDelete(ctx context.Context, order OrderInterface) error {
 	if order == nil {
 		return errors.New("order is nil")
 	}
 
-	return store.OrderDeleteByID(order.ID())
+	return store.OrderDeleteByID(ctx, order.ID())
 }
 
-func (store *Store) OrderDeleteByID(id string) error {
+func (store *Store) OrderDeleteByID(ctx context.Context, id string) error {
 	if id == "" {
 		return errors.New("order id is empty")
 	}
@@ -750,41 +758,39 @@ func (store *Store) OrderDeleteByID(id string) error {
 		return errSql
 	}
 
-	if store.debugEnabled {
-		log.Println(sqlStr)
-	}
+	store.logSql("delete", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	return err
 }
 
-func (store *Store) OrderSoftDelete(order OrderInterface) error {
+func (store *Store) OrderSoftDelete(ctx context.Context, order OrderInterface) error {
 	if order == nil {
 		return errors.New("order is empty")
 	}
 
 	order.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
-	return store.OrderUpdate(order)
+	return store.OrderUpdate(ctx, order)
 }
 
-func (store *Store) OrderSoftDeleteByID(id string) error {
-	order, err := store.OrderFindByID(id)
+func (store *Store) OrderSoftDeleteByID(ctx context.Context, id string) error {
+	order, err := store.OrderFindByID(ctx, id)
 
 	if err != nil {
 		return err
 	}
 
-	return store.OrderSoftDelete(order)
+	return store.OrderSoftDelete(ctx, order)
 }
 
-func (store *Store) OrderFindByID(id string) (OrderInterface, error) {
+func (store *Store) OrderFindByID(ctx context.Context, id string) (OrderInterface, error) {
 	if id == "" {
 		return nil, errors.New("order id is empty")
 	}
 
-	list, err := store.OrderList(OrderQueryOptions{
+	list, err := store.OrderList(ctx, OrderQueryOptions{
 		ID:    id,
 		Limit: 1,
 	})
@@ -800,7 +806,7 @@ func (store *Store) OrderFindByID(id string) (OrderInterface, error) {
 	return nil, nil
 }
 
-func (store *Store) OrderList(options OrderQueryOptions) ([]OrderInterface, error) {
+func (store *Store) OrderList(ctx context.Context, options OrderQueryOptions) ([]OrderInterface, error) {
 	q := store.orderQuery(options)
 
 	sqlStr, _, errSql := q.Select().ToSQL()
@@ -811,8 +817,8 @@ func (store *Store) OrderList(options OrderQueryOptions) ([]OrderInterface, erro
 
 	store.logSql("select", sqlStr)
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	modelMaps, err := db.SelectToMapString(sqlStr)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr)
+
 	if err != nil {
 		return []OrderInterface{}, err
 	}
@@ -827,7 +833,7 @@ func (store *Store) OrderList(options OrderQueryOptions) ([]OrderInterface, erro
 	return list, nil
 }
 
-func (store *Store) OrderUpdate(order OrderInterface) error {
+func (store *Store) OrderUpdate(ctx context.Context, order OrderInterface) error {
 	if order == nil {
 		return errors.New("order is nil")
 	}
@@ -857,7 +863,7 @@ func (store *Store) OrderUpdate(order OrderInterface) error {
 
 	store.logSql("update", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	order.MarkAsNotDirty()
 
@@ -928,7 +934,7 @@ func (store *Store) orderQuery(options OrderQueryOptions) *goqu.SelectDataset {
 	return q.Where(softDeleted)
 }
 
-func (store *Store) OrderLineItemCount(options OrderLineItemQueryOptions) (int64, error) {
+func (store *Store) OrderLineItemCount(ctx context.Context, options OrderLineItemQueryOptions) (int64, error) {
 	options.CountOnly = true
 	q := store.orderLineItemQuery(options)
 
@@ -941,12 +947,10 @@ func (store *Store) OrderLineItemCount(options OrderLineItemQueryOptions) (int64
 		return -1, nil
 	}
 
-	if store.debugEnabled {
-		log.Println(sqlStr)
-	}
+	store.logSql("count", sqlStr, params...)
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	mapped, err := db.SelectToMapString(sqlStr, params...)
+	mapped, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
+
 	if err != nil {
 		return -1, err
 	}
@@ -967,7 +971,11 @@ func (store *Store) OrderLineItemCount(options OrderLineItemQueryOptions) (int64
 	return i, nil
 }
 
-func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) error {
+func (store *Store) OrderLineItemCreate(ctx context.Context, orderLineItem OrderLineItemInterface) error {
+	if orderLineItem == nil {
+		return errors.New("orderLineItem is nil")
+	}
+
 	orderLineItem.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	orderLineItem.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	orderLineItem.SetDeletedAt(sb.MAX_DATETIME)
@@ -986,7 +994,7 @@ func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) er
 
 	store.logSql("insert", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -997,7 +1005,11 @@ func (store *Store) OrderLineItemCreate(orderLineItem OrderLineItemInterface) er
 	return nil
 }
 
-func (store *Store) OrderLineItemDeleteByID(id string) error {
+func (store *Store) OrderLineItemDeleteByID(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("order line id is empty")
+	}
+
 	sqlStr, params, errSql := goqu.Dialect(store.dbDriverName).
 		Delete(store.orderLineItemTableName).
 		Prepared(true).
@@ -1010,21 +1022,21 @@ func (store *Store) OrderLineItemDeleteByID(id string) error {
 
 	store.logSql("delete", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	return err
 }
 
-func (store *Store) OrderLineItemDelete(orderLineItem OrderLineItemInterface) error {
-	return store.OrderLineItemDeleteByID(orderLineItem.ID())
+func (store *Store) OrderLineItemDelete(ctx context.Context, orderLineItem OrderLineItemInterface) error {
+	return store.OrderLineItemDeleteByID(ctx, orderLineItem.ID())
 }
 
-func (store *Store) OrderLineItemFindByID(id string) (OrderLineItemInterface, error) {
+func (store *Store) OrderLineItemFindByID(ctx context.Context, id string) (OrderLineItemInterface, error) {
 	if id == "" {
 		return nil, errors.New("order line id is empty")
 	}
 
-	list, err := store.OrderLineItemList(OrderLineItemQueryOptions{
+	list, err := store.OrderLineItemList(ctx, OrderLineItemQueryOptions{
 		ID:    id,
 		Limit: 1,
 	})
@@ -1040,7 +1052,7 @@ func (store *Store) OrderLineItemFindByID(id string) (OrderLineItemInterface, er
 	return nil, nil
 }
 
-func (store *Store) OrderLineItemList(options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error) {
+func (store *Store) OrderLineItemList(ctx context.Context, options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error) {
 	q := store.orderLineItemQuery(options)
 
 	sqlStr, params, errSql := q.Prepared(true).ToSQL()
@@ -1051,9 +1063,7 @@ func (store *Store) OrderLineItemList(options OrderLineItemQueryOptions) ([]Orde
 
 	store.logSql("select", sqlStr, params...)
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-
-	modelMaps, err := db.SelectToMapString(sqlStr, params...)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return []OrderLineItemInterface{}, err
@@ -1069,27 +1079,27 @@ func (store *Store) OrderLineItemList(options OrderLineItemQueryOptions) ([]Orde
 	return list, nil
 }
 
-func (store *Store) OrderLineItemSoftDelete(orderLineItem OrderLineItemInterface) error {
+func (store *Store) OrderLineItemSoftDelete(ctx context.Context, orderLineItem OrderLineItemInterface) error {
 	if orderLineItem == nil {
 		return errors.New("order line is empty")
 	}
 
 	orderLineItem.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
-	return store.OrderLineItemUpdate(orderLineItem)
+	return store.OrderLineItemUpdate(ctx, orderLineItem)
 }
 
-func (store *Store) OrderLineItemSoftDeleteByID(id string) error {
-	item, err := store.OrderLineItemFindByID(id)
+func (store *Store) OrderLineItemSoftDeleteByID(ctx context.Context, id string) error {
+	item, err := store.OrderLineItemFindByID(ctx, id)
 
 	if err != nil {
 		return err
 	}
 
-	return store.OrderLineItemSoftDelete(item)
+	return store.OrderLineItemSoftDelete(ctx, item)
 }
 
-func (store *Store) OrderLineItemUpdate(orderLineItem OrderLineItemInterface) error {
+func (store *Store) OrderLineItemUpdate(ctx context.Context, orderLineItem OrderLineItemInterface) error {
 	if orderLineItem == nil {
 		return errors.New("orderLineItem is nil")
 	}
@@ -1119,7 +1129,7 @@ func (store *Store) OrderLineItemUpdate(orderLineItem OrderLineItemInterface) er
 
 	store.logSql("update", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	orderLineItem.MarkAsNotDirty()
 
@@ -1186,7 +1196,7 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryOptions) *goqu.
 	return q.Where(softDeleted)
 }
 
-func (store *Store) ProductCount(options ProductQueryOptions) (int64, error) {
+func (store *Store) ProductCount(ctx context.Context, options ProductQueryOptions) (int64, error) {
 	options.CountOnly = true
 	q := store.productQuery(options)
 
@@ -1199,12 +1209,10 @@ func (store *Store) ProductCount(options ProductQueryOptions) (int64, error) {
 		return -1, nil
 	}
 
-	if store.debugEnabled {
-		log.Println(sqlStr)
-	}
+	store.logSql("count", sqlStr, params...)
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	mapped, err := db.SelectToMapString(sqlStr, params...)
+	mapped, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, params...)
+
 	if err != nil {
 		return -1, err
 	}
@@ -1225,7 +1233,11 @@ func (store *Store) ProductCount(options ProductQueryOptions) (int64, error) {
 	return i, nil
 }
 
-func (store *Store) ProductCreate(product ProductInterface) error {
+func (store *Store) ProductCreate(ctx context.Context, product ProductInterface) error {
+	if product == nil {
+		return errors.New("product is nil")
+	}
+
 	product.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	product.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	product.SetDeletedAt(sb.MAX_DATETIME)
@@ -1244,7 +1256,7 @@ func (store *Store) ProductCreate(product ProductInterface) error {
 
 	store.logSql("insert", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	if err != nil {
 		return err
@@ -1255,15 +1267,15 @@ func (store *Store) ProductCreate(product ProductInterface) error {
 	return nil
 }
 
-func (store *Store) ProductDelete(product ProductInterface) error {
+func (store *Store) ProductDelete(ctx context.Context, product ProductInterface) error {
 	if product == nil {
 		return errors.New("product is nil")
 	}
 
-	return store.ProductDeleteByID(product.ID())
+	return store.ProductDeleteByID(ctx, product.ID())
 }
 
-func (store *Store) ProductDeleteByID(id string) error {
+func (store *Store) ProductDeleteByID(ctx context.Context, id string) error {
 	if id == "" {
 		return errors.New("product id is empty")
 	}
@@ -1282,37 +1294,37 @@ func (store *Store) ProductDeleteByID(id string) error {
 		log.Println(sqlStr)
 	}
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	return err
 }
 
-func (store *Store) ProductSoftDelete(product ProductInterface) error {
+func (store *Store) ProductSoftDelete(ctx context.Context, product ProductInterface) error {
 	if product == nil {
 		return errors.New("product is empty")
 	}
 
 	product.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
-	return store.ProductUpdate(product)
+	return store.ProductUpdate(ctx, product)
 }
 
-func (store *Store) ProductSoftDeleteByID(id string) error {
-	product, err := store.ProductFindByID(id)
+func (store *Store) ProductSoftDeleteByID(ctx context.Context, id string) error {
+	product, err := store.ProductFindByID(ctx, id)
 
 	if err != nil {
 		return err
 	}
 
-	return store.ProductSoftDelete(product)
+	return store.ProductSoftDelete(ctx, product)
 }
 
-func (store *Store) ProductFindByID(id string) (ProductInterface, error) {
+func (store *Store) ProductFindByID(ctx context.Context, id string) (ProductInterface, error) {
 	if id == "" {
 		return nil, errors.New("product id is empty")
 	}
 
-	list, err := store.ProductList(ProductQueryOptions{
+	list, err := store.ProductList(ctx, ProductQueryOptions{
 		ID:    id,
 		Limit: 1,
 	})
@@ -1328,7 +1340,7 @@ func (store *Store) ProductFindByID(id string) (ProductInterface, error) {
 	return nil, nil
 }
 
-func (store *Store) ProductList(options ProductQueryOptions) ([]ProductInterface, error) {
+func (store *Store) ProductList(ctx context.Context, options ProductQueryOptions) ([]ProductInterface, error) {
 	q := store.productQuery(options)
 
 	sqlStr, _, errSql := q.Select().ToSQL()
@@ -1339,8 +1351,7 @@ func (store *Store) ProductList(options ProductQueryOptions) ([]ProductInterface
 
 	store.logSql("select", sqlStr)
 
-	db := sb.NewDatabase(store.db, store.dbDriverName)
-	modelMaps, err := db.SelectToMapString(sqlStr)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr)
 	if err != nil {
 		return []ProductInterface{}, err
 	}
@@ -1355,7 +1366,7 @@ func (store *Store) ProductList(options ProductQueryOptions) ([]ProductInterface
 	return list, nil
 }
 
-func (store *Store) ProductUpdate(product ProductInterface) error {
+func (store *Store) ProductUpdate(ctx context.Context, product ProductInterface) error {
 	if product == nil {
 		return errors.New("product is nil")
 	}
@@ -1385,7 +1396,7 @@ func (store *Store) ProductUpdate(product ProductInterface) error {
 
 	store.logSql("update", sqlStr, params...)
 
-	_, err := store.db.Exec(sqlStr, params...)
+	_, err := database.Execute(store.toQuerableContext(ctx), sqlStr, params...)
 
 	product.MarkAsNotDirty()
 

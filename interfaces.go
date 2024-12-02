@@ -2,6 +2,7 @@ package shopstore
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 
 	"github.com/dromara/carbon/v2"
@@ -267,9 +268,10 @@ type ProductInterface interface {
 
 type StoreInterface interface {
 	AutoMigrate() error
+	DB() *sql.DB
 	EnableDebug(debug bool, sqlLogger ...*slog.Logger)
 
-	CategoryCount(context context.Context, options CategoryQueryInterface) (int64, error)
+	CategoryCount(ctx context.Context, options CategoryQueryInterface) (int64, error)
 	CategoryCreate(context context.Context, category CategoryInterface) error
 	CategoryDelete(context context.Context, category CategoryInterface) error
 	CategoryDeleteByID(context context.Context, categoryID string) error
@@ -279,44 +281,44 @@ type StoreInterface interface {
 	CategorySoftDeleteByID(context context.Context, categoryID string) error
 	CategoryUpdate(contxt context.Context, category CategoryInterface) error
 
-	DiscountCount(options DiscountQueryOptions) (int64, error)
-	DiscountCreate(discount DiscountInterface) error
-	DiscountDelete(discount DiscountInterface) error
-	DiscountDeleteByID(discountID string) error
-	DiscountFindByID(discountID string) (DiscountInterface, error)
-	DiscountFindByCode(code string) (DiscountInterface, error)
-	DiscountList(options DiscountQueryOptions) ([]DiscountInterface, error)
-	DiscountSoftDelete(discount DiscountInterface) error
-	DiscountSoftDeleteByID(discountID string) error
-	DiscountUpdate(discount DiscountInterface) error
+	DiscountCount(ctx context.Context, options DiscountQueryOptions) (int64, error)
+	DiscountCreate(ctx context.Context, discount DiscountInterface) error
+	DiscountDelete(ctx context.Context, discount DiscountInterface) error
+	DiscountDeleteByID(ctx context.Context, discountID string) error
+	DiscountFindByID(ctx context.Context, discountID string) (DiscountInterface, error)
+	DiscountFindByCode(ctx context.Context, code string) (DiscountInterface, error)
+	DiscountList(ctx context.Context, options DiscountQueryOptions) ([]DiscountInterface, error)
+	DiscountSoftDelete(ctx context.Context, discount DiscountInterface) error
+	DiscountSoftDeleteByID(ctx context.Context, discountID string) error
+	DiscountUpdate(ctx context.Context, discount DiscountInterface) error
 
-	OrderCount(options OrderQueryOptions) (int64, error)
-	OrderCreate(order OrderInterface) error
-	OrderDelete(order OrderInterface) error
-	OrderDeleteByID(id string) error
-	OrderFindByID(id string) (OrderInterface, error)
-	OrderList(options OrderQueryOptions) ([]OrderInterface, error)
-	OrderSoftDelete(order OrderInterface) error
-	OrderSoftDeleteByID(id string) error
-	OrderUpdate(order OrderInterface) error
+	OrderCount(ctx context.Context, options OrderQueryOptions) (int64, error)
+	OrderCreate(ctx context.Context, order OrderInterface) error
+	OrderDelete(ctx context.Context, order OrderInterface) error
+	OrderDeleteByID(ctx context.Context, id string) error
+	OrderFindByID(ctx context.Context, id string) (OrderInterface, error)
+	OrderList(ctx context.Context, options OrderQueryOptions) ([]OrderInterface, error)
+	OrderSoftDelete(ctx context.Context, order OrderInterface) error
+	OrderSoftDeleteByID(ctx context.Context, id string) error
+	OrderUpdate(ctx context.Context, order OrderInterface) error
 
-	OrderLineItemCount(options OrderLineItemQueryOptions) (int64, error)
-	OrderLineItemCreate(orderLineItem OrderLineItemInterface) error
-	OrderLineItemDelete(orderLineItem OrderLineItemInterface) error
-	OrderLineItemDeleteByID(id string) error
-	OrderLineItemFindByID(id string) (OrderLineItemInterface, error)
-	OrderLineItemList(options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error)
-	OrderLineItemSoftDelete(orderLineItem OrderLineItemInterface) error
-	OrderLineItemSoftDeleteByID(id string) error
-	OrderLineItemUpdate(orderLineItem OrderLineItemInterface) error
+	OrderLineItemCount(ctx context.Context, options OrderLineItemQueryOptions) (int64, error)
+	OrderLineItemCreate(ctx context.Context, orderLineItem OrderLineItemInterface) error
+	OrderLineItemDelete(ctx context.Context, orderLineItem OrderLineItemInterface) error
+	OrderLineItemDeleteByID(ctx context.Context, id string) error
+	OrderLineItemFindByID(ctx context.Context, id string) (OrderLineItemInterface, error)
+	OrderLineItemList(ctx context.Context, options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error)
+	OrderLineItemSoftDelete(ctx context.Context, orderLineItem OrderLineItemInterface) error
+	OrderLineItemSoftDeleteByID(ctx context.Context, id string) error
+	OrderLineItemUpdate(ctx context.Context, orderLineItem OrderLineItemInterface) error
 
-	ProductCount(options ProductQueryOptions) (int64, error)
-	ProductCreate(product ProductInterface) error
-	ProductDelete(product ProductInterface) error
-	ProductDeleteByID(productID string) error
-	ProductFindByID(productID string) (ProductInterface, error)
-	ProductList(options ProductQueryOptions) ([]ProductInterface, error)
-	ProductSoftDelete(product ProductInterface) error
-	ProductSoftDeleteByID(productID string) error
-	ProductUpdate(product ProductInterface) error
+	ProductCount(ctx context.Context, options ProductQueryOptions) (int64, error)
+	ProductCreate(ctx context.Context, product ProductInterface) error
+	ProductDelete(ctx context.Context, product ProductInterface) error
+	ProductDeleteByID(ctx context.Context, productID string) error
+	ProductFindByID(ctx context.Context, productID string) (ProductInterface, error)
+	ProductList(ctx context.Context, options ProductQueryOptions) ([]ProductInterface, error)
+	ProductSoftDelete(ctx context.Context, product ProductInterface) error
+	ProductSoftDeleteByID(ctx context.Context, productID string) error
+	ProductUpdate(ctx context.Context, product ProductInterface) error
 }

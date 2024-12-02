@@ -475,7 +475,8 @@ func TestStoreDiscountCreate(t *testing.T) {
 		SetStatus(DISCOUNT_STATUS_DRAFT).
 		SetTitle("DISCOUNT_TITLE")
 
-	err = store.DiscountCreate(discount)
+	ctx := context.Background()
+	err = store.DiscountCreate(ctx, discount)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -511,20 +512,21 @@ func TestStoreDiscountDelete(t *testing.T) {
 		SetStatus(DISCOUNT_STATUS_DRAFT).
 		SetTitle("DISCOUNT_TITLE")
 
-	err = store.DiscountCreate(discount)
+	ctx := context.Background()
+	err = store.DiscountCreate(ctx, discount)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
 	}
 
-	err = store.DiscountDelete(discount)
+	err = store.DiscountDelete(ctx, discount)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	discountFound, errFind := store.DiscountFindByID(discount.ID())
+	discountFound, errFind := store.DiscountFindByID(ctx, discount.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -566,20 +568,21 @@ func TestStoreDiscountDeleteByID(t *testing.T) {
 		SetStatus(DISCOUNT_STATUS_DRAFT).
 		SetTitle("DISCOUNT_TITLE")
 
-	err = store.DiscountCreate(discount)
+	ctx := context.Background()
+	err = store.DiscountCreate(ctx, discount)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
 	}
 
-	err = store.DiscountDeleteByID(discount.ID())
+	err = store.DiscountDeleteByID(ctx, discount.ID())
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	discountFound, errFind := store.DiscountFindByID(discount.ID())
+	discountFound, errFind := store.DiscountFindByID(ctx, discount.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -626,14 +629,15 @@ func TestStoreDiscountFindByID(t *testing.T) {
 		SetStartsAt(`2022-01-01 00:00:00`).
 		SetEndsAt(`2022-01-01 23:59:59`)
 
-	err = store.DiscountCreate(discount)
+	ctx := context.Background()
+	err = store.DiscountCreate(ctx, discount)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
 	}
 
-	discountFound, errFind := store.DiscountFindByID(discount.ID())
+	discountFound, errFind := store.DiscountFindByID(ctx, discount.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -719,19 +723,20 @@ func TestStoreDiscountSoftDelete(t *testing.T) {
 		SetStatus(DISCOUNT_STATUS_DRAFT).
 		SetTitle("DISCOUNT_TITLE")
 
-	err = store.DiscountCreate(discount)
+	ctx := context.Background()
+	err = store.DiscountCreate(ctx, discount)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
 	}
 
-	err = store.DiscountSoftDelete(discount)
+	err = store.DiscountSoftDelete(ctx, discount)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
 	}
 
-	discountFound, errFind := store.DiscountFindByID(discount.ID())
+	discountFound, errFind := store.DiscountFindByID(ctx, discount.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -743,7 +748,7 @@ func TestStoreDiscountSoftDelete(t *testing.T) {
 		return
 	}
 
-	discountList, errList := store.DiscountList(DiscountQueryOptions{
+	discountList, errList := store.DiscountList(ctx, DiscountQueryOptions{
 		ID:          discount.ID(),
 		WithDeleted: true,
 	})
@@ -793,7 +798,8 @@ func TestStoreDiscountUpdate(t *testing.T) {
 		SetStartsAt(`2022-01-01 00:00:00`).
 		SetEndsAt(`2022-01-01 23:59:59`)
 
-	err = store.DiscountCreate(discount)
+	ctx := context.Background()
+	err = store.DiscountCreate(ctx, discount)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
@@ -801,13 +807,13 @@ func TestStoreDiscountUpdate(t *testing.T) {
 
 	discount.SetTitle("DISCOUNT_TITLE_UPDATED")
 
-	err = store.DiscountUpdate(discount)
+	err = store.DiscountUpdate(ctx, discount)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 		return
 	}
 
-	discountFound, errFind := store.DiscountFindByID(discount.ID())
+	discountFound, errFind := store.DiscountFindByID(ctx, discount.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -862,7 +868,8 @@ func TestStoreOderCreate(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderCreate(order)
+	ctx := context.Background()
+	err = store.OrderCreate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
@@ -899,18 +906,19 @@ func TestStoreOderDelete(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderCreate(order)
+	ctx := context.Background()
+	err = store.OrderCreate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderDelete(order)
+	err = store.OrderDelete(ctx, order)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderFound, err := store.OrderFindByID(order.ID())
+	orderFound, err := store.OrderFindByID(ctx, order.ID())
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
@@ -951,18 +959,19 @@ func TestStoreOderDeleteByID(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderCreate(order)
+	ctx := context.Background()
+	err = store.OrderCreate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderDeleteByID(order.ID())
+	err = store.OrderDeleteByID(ctx, order.ID())
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderFound, err := store.OrderFindByID(order.ID())
+	orderFound, err := store.OrderFindByID(ctx, order.ID())
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
@@ -1013,12 +1022,13 @@ func TestStoreOrderFindByID(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderCreate(order)
+	ctx := context.Background()
+	err = store.OrderCreate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderFound, errFind := store.OrderFindByID(order.ID())
+	orderFound, errFind := store.OrderFindByID(ctx, order.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1092,12 +1102,13 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderCreate(order)
+	ctx := context.Background()
+	err = store.OrderCreate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderSoftDeleteByID(order.ID())
+	err = store.OrderSoftDeleteByID(ctx, order.ID())
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -1107,7 +1118,7 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 		t.Fatal("Order MUST NOT be soft deleted")
 	}
 
-	orderFound, errFind := store.OrderFindByID(order.ID())
+	orderFound, errFind := store.OrderFindByID(ctx, order.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1117,7 +1128,7 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 		t.Fatal("Order MUST be nil")
 	}
 
-	orderFindWithDeleted, errFind := store.OrderList(OrderQueryOptions{
+	orderFindWithDeleted, errFind := store.OrderList(ctx, OrderQueryOptions{
 		ID:          order.ID(),
 		WithDeleted: true,
 	})
@@ -1168,19 +1179,20 @@ func TestStoreOrderUpdate(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderCreate(order)
+	ctx := context.Background()
+	err = store.OrderCreate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
 	order.SetMemo("test memo")
 
-	err = store.OrderUpdate(order)
+	err = store.OrderUpdate(ctx, order)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderFound, errFind := store.OrderFindByID(order.ID())
+	orderFound, errFind := store.OrderFindByID(ctx, order.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1226,7 +1238,8 @@ func TestStoreOrderLineItemCreate(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderLineItemCreate(orderLineItem)
+	ctx := context.Background()
+	err = store.OrderLineItemCreate(ctx, orderLineItem)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
@@ -1263,17 +1276,18 @@ func TestStoreOrderLineItemDelete(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderLineItemCreate(orderLineItem)
+	ctx := context.Background()
+	err = store.OrderLineItemCreate(ctx, orderLineItem)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderLineItemDelete(orderLineItem)
+	err = store.OrderLineItemDelete(ctx, orderLineItem)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderLineItemFound, errFind := store.OrderLineItemFindByID(orderLineItem.ID())
+	orderLineItemFound, errFind := store.OrderLineItemFindByID(ctx, orderLineItem.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1315,12 +1329,13 @@ func TestStoreOrderLineItemFindByID(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderLineItemCreate(orderLineItem)
+	ctx := context.Background()
+	err = store.OrderLineItemCreate(ctx, orderLineItem)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderLineItemFound, errFind := store.OrderLineItemFindByID(orderLineItem.ID())
+	orderLineItemFound, errFind := store.OrderLineItemFindByID(ctx, orderLineItem.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1362,12 +1377,13 @@ func TestStoreOrderLineItemList(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderLineItemCreate(orderLineItem)
+	ctx := context.Background()
+	err = store.OrderLineItemCreate(ctx, orderLineItem)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderLineItemsFound, errFind := store.OrderLineItemList(OrderLineItemQueryOptions{})
+	orderLineItemsFound, errFind := store.OrderLineItemList(ctx, OrderLineItemQueryOptions{})
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1409,17 +1425,18 @@ func TestStoreOrderLineItemSoftDeleteByID(t *testing.T) {
 		SetQuantityInt(1).
 		SetPriceFloat(19.99)
 
-	err = store.OrderLineItemCreate(orderLineItem)
+	ctx := context.Background()
+	err = store.OrderLineItemCreate(ctx, orderLineItem)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.OrderLineItemSoftDeleteByID(orderLineItem.ID())
+	err = store.OrderLineItemSoftDeleteByID(ctx, orderLineItem.ID())
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	orderLineItemFound, errFind := store.OrderLineItemFindByID(orderLineItem.ID())
+	orderLineItemFound, errFind := store.OrderLineItemFindByID(ctx, orderLineItem.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1429,7 +1446,7 @@ func TestStoreOrderLineItemSoftDeleteByID(t *testing.T) {
 		t.Fatal("OrderLineItem MUST be nil")
 	}
 
-	orderLineItems, errFind := store.OrderLineItemList(OrderLineItemQueryOptions{
+	orderLineItems, errFind := store.OrderLineItemList(ctx, OrderLineItemQueryOptions{
 		OrderID:     orderLineItem.OrderID(),
 		WithDeleted: true,
 	})
@@ -1482,7 +1499,8 @@ func TestStoreProductCreate(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.ProductCreate(product)
+	ctx := context.Background()
+	err = store.ProductCreate(ctx, product)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
@@ -1529,12 +1547,13 @@ func TestStoreProductFindByID(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	err = store.ProductCreate(product)
+	ctx := context.Background()
+	err = store.ProductCreate(ctx, product)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	productFound, errFind := store.ProductFindByID(product.ID())
+	productFound, errFind := store.ProductFindByID(ctx, product.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1609,7 +1628,8 @@ func TestStoreProductSoftDelete(t *testing.T) {
 		SetPriceFloat(19.99).
 		SetMemo("test ruler")
 
-	err = store.ProductCreate(product)
+	ctx := context.Background()
+	err = store.ProductCreate(ctx, product)
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
@@ -1618,13 +1638,13 @@ func TestStoreProductSoftDelete(t *testing.T) {
 		t.Fatal("Product MUST NOT be soft deleted")
 	}
 
-	err = store.ProductSoftDelete(product)
+	err = store.ProductSoftDelete(ctx, product)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
 	}
 
-	productFound, errFind := store.ProductFindByID(product.ID())
+	productFound, errFind := store.ProductFindByID(ctx, product.ID())
 
 	if errFind != nil {
 		t.Fatal("unexpected error:", errFind)
@@ -1634,7 +1654,7 @@ func TestStoreProductSoftDelete(t *testing.T) {
 		t.Fatal("Product MUST be nil")
 	}
 
-	productFindWithDeleted, errFind := store.ProductList(ProductQueryOptions{
+	productFindWithDeleted, errFind := store.ProductList(ctx, ProductQueryOptions{
 		ID:          product.ID(),
 		Limit:       1,
 		WithDeleted: true,
