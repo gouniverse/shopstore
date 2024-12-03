@@ -13,11 +13,15 @@ import (
 	"github.com/gouniverse/base/database"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 )
 
-func (store *Store) DiscountCount(ctx context.Context, options DiscountQueryOptions) (int64, error) {
-	options.CountOnly = true
-	q := store.discountQuery(options)
+func (store *Store) DiscountCount(ctx context.Context, options DiscountQueryInterface) (int64, error) {
+	q, _, err := store.discountQuery(options.SetCountOnly(true))
+
+	if err != nil {
+		return -1, err
+	}
 
 	sqlStr, params, errSql := q.Prepared(true).
 		Limit(1).
@@ -123,10 +127,9 @@ func (store *Store) DiscountFindByID(ctx context.Context, id string) (DiscountIn
 		return nil, errors.New("discount id is empty")
 	}
 
-	list, err := store.DiscountList(ctx, DiscountQueryOptions{
-		ID:    id,
-		Limit: 1,
-	})
+	list, err := store.DiscountList(ctx, NewDiscountQuery().
+		SetID(id).
+		SetLimit(1))
 
 	if err != nil {
 		return nil, err
@@ -144,11 +147,10 @@ func (store *Store) DiscountFindByCode(ctx context.Context, code string) (Discou
 		return nil, errors.New("discount code is empty")
 	}
 
-	list, err := store.DiscountList(ctx, DiscountQueryOptions{
-		Status: DISCOUNT_STATUS_ACTIVE,
-		Code:   code,
-		Limit:  1,
-	})
+	list, err := store.DiscountList(ctx, NewDiscountQuery().
+		SetStatus(DISCOUNT_STATUS_ACTIVE).
+		SetCode(code).
+		SetLimit(1))
 
 	if err != nil {
 		return nil, err
@@ -161,10 +163,14 @@ func (store *Store) DiscountFindByCode(ctx context.Context, code string) (Discou
 	return nil, nil
 }
 
-func (store *Store) DiscountList(ctx context.Context, options DiscountQueryOptions) ([]DiscountInterface, error) {
-	q := store.discountQuery(options)
+func (store *Store) DiscountList(ctx context.Context, options DiscountQueryInterface) ([]DiscountInterface, error) {
+	q, columns, err := store.discountQuery(options)
 
-	sqlStr, _, errSql := q.Select().ToSQL()
+	if err != nil {
+		return []DiscountInterface{}, err
+	}
+
+	sqlStr, sqlParams, errSql := q.Prepared(true).Select(columns...).ToSQL()
 
 	if errSql != nil {
 		return []DiscountInterface{}, nil
@@ -174,7 +180,7 @@ func (store *Store) DiscountList(ctx context.Context, options DiscountQueryOptio
 		log.Println(sqlStr)
 	}
 
-	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, sqlParams...)
 
 	if err != nil {
 		return []DiscountInterface{}, err
@@ -249,66 +255,77 @@ func (store *Store) DiscountUpdate(ctx context.Context, discount DiscountInterfa
 	return err
 }
 
-func (store *Store) discountQuery(options DiscountQueryOptions) *goqu.SelectDataset {
+func (store *Store) discountQuery(options DiscountQueryInterface) (selectDataset *goqu.SelectDataset, columns []any, err error) {
+	if options == nil {
+		options = NewDiscountQuery()
+	}
+
+	if err := options.Validate(); err != nil {
+		return nil, nil, err
+	}
+
 	q := goqu.Dialect(store.dbDriverName).From(store.discountTableName)
 
-	if options.ID != "" {
-		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
+	if options.HasID() {
+		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID()))
 	}
 
-	if len(options.IDIn) > 0 {
-		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn))
+	if options.HasIDIn() {
+		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn()))
 	}
 
-	if options.Status != "" {
-		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
+	if options.HasStatus() {
+		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status()))
 	}
 
-	if len(options.StatusIn) > 0 {
-		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
+	if options.HasStatusIn() {
+		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn()))
 	}
 
-	if options.Code != "" {
-		q = q.Where(goqu.C(COLUMN_CODE).Eq(options.Code))
+	if options.HasCode() {
+		q = q.Where(goqu.C(COLUMN_CODE).Eq(options.Code()))
 	}
 
-	if options.CreatedAtGte != "" && options.CreatedAtLte != "" {
-		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte, options.CreatedAtLte)))
-	} else if options.CreatedAtGte != "" {
-		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte))
-	} else if options.CreatedAtLte != "" {
-		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte))
+	if options.HasCreatedAtGte() && options.HasCreatedAtLte() {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte(), options.CreatedAtLte())))
+	} else if options.HasCreatedAtGte() {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte()))
+	} else if options.HasCreatedAtLte() {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte()))
 	}
 
-	if !options.CountOnly {
-		if options.Limit > 0 {
-			q = q.Limit(uint(options.Limit))
+	if !options.IsCountOnly() {
+		if options.HasLimit() {
+			q = q.Limit(cast.ToUint(options.Limit()))
 		}
 
-		if options.Offset > 0 {
-			q = q.Offset(uint(options.Offset))
+		if options.HasOffset() {
+			q = q.Offset(cast.ToUint(options.Offset()))
 		}
 	}
 
-	sortOrder := sb.DESC
-	if options.SortOrder != "" {
-		sortOrder = options.SortOrder
-	}
+	sortOrder := lo.Ternary(options.HasSortDirection(), options.SortDirection(), sb.DESC)
 
-	if options.OrderBy != "" {
+	if options.HasOrderBy() {
 		if strings.EqualFold(sortOrder, sb.ASC) {
-			q = q.Order(goqu.I(options.OrderBy).Asc())
+			q = q.Order(goqu.I(options.OrderBy()).Asc())
 		} else {
-			q = q.Order(goqu.I(options.OrderBy).Desc())
+			q = q.Order(goqu.I(options.OrderBy()).Desc())
 		}
 	}
 
-	if options.WithDeleted {
-		return q
+	columns = []any{}
+
+	for _, column := range options.Columns() {
+		columns = append(columns, column)
+	}
+
+	if options.SoftDeletedIncluded() {
+		return q, columns, nil // soft deleted discounts requested specifically
 	}
 
 	softDeleted := goqu.C(COLUMN_DELETED_AT).
 		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
 
-	return q.Where(softDeleted)
+	return q.Where(softDeleted), columns, nil
 }

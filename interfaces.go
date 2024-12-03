@@ -344,13 +344,13 @@ type StoreInterface interface {
 	CategorySoftDeleteByID(context context.Context, categoryID string) error
 	CategoryUpdate(contxt context.Context, category CategoryInterface) error
 
-	DiscountCount(ctx context.Context, options DiscountQueryOptions) (int64, error)
+	DiscountCount(ctx context.Context, options DiscountQueryInterface) (int64, error)
 	DiscountCreate(ctx context.Context, discount DiscountInterface) error
 	DiscountDelete(ctx context.Context, discount DiscountInterface) error
 	DiscountDeleteByID(ctx context.Context, discountID string) error
 	DiscountFindByID(ctx context.Context, discountID string) (DiscountInterface, error)
 	DiscountFindByCode(ctx context.Context, code string) (DiscountInterface, error)
-	DiscountList(ctx context.Context, options DiscountQueryOptions) ([]DiscountInterface, error)
+	DiscountList(ctx context.Context, options DiscountQueryInterface) ([]DiscountInterface, error)
 	DiscountSoftDelete(ctx context.Context, discount DiscountInterface) error
 	DiscountSoftDeleteByID(ctx context.Context, discountID string) error
 	DiscountUpdate(ctx context.Context, discount DiscountInterface) error
