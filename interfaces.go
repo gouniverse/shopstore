@@ -358,22 +358,22 @@ type StoreInterface interface {
 	MediaSoftDeleteByID(ctx context.Context, mediaID string) error
 	MediaUpdate(ctx context.Context, media MediaInterface) error
 
-	OrderCount(ctx context.Context, options OrderQueryOptions) (int64, error)
+	OrderCount(ctx context.Context, options OrderQueryInterface) (int64, error)
 	OrderCreate(ctx context.Context, order OrderInterface) error
 	OrderDelete(ctx context.Context, order OrderInterface) error
 	OrderDeleteByID(ctx context.Context, id string) error
 	OrderFindByID(ctx context.Context, id string) (OrderInterface, error)
-	OrderList(ctx context.Context, options OrderQueryOptions) ([]OrderInterface, error)
+	OrderList(ctx context.Context, options OrderQueryInterface) ([]OrderInterface, error)
 	OrderSoftDelete(ctx context.Context, order OrderInterface) error
 	OrderSoftDeleteByID(ctx context.Context, id string) error
 	OrderUpdate(ctx context.Context, order OrderInterface) error
 
-	OrderLineItemCount(ctx context.Context, options OrderLineItemQueryOptions) (int64, error)
+	OrderLineItemCount(ctx context.Context, options OrderLineItemQueryInterface) (int64, error)
 	OrderLineItemCreate(ctx context.Context, orderLineItem OrderLineItemInterface) error
 	OrderLineItemDelete(ctx context.Context, orderLineItem OrderLineItemInterface) error
 	OrderLineItemDeleteByID(ctx context.Context, id string) error
 	OrderLineItemFindByID(ctx context.Context, id string) (OrderLineItemInterface, error)
-	OrderLineItemList(ctx context.Context, options OrderLineItemQueryOptions) ([]OrderLineItemInterface, error)
+	OrderLineItemList(ctx context.Context, options OrderLineItemQueryInterface) ([]OrderLineItemInterface, error)
 	OrderLineItemSoftDelete(ctx context.Context, orderLineItem OrderLineItemInterface) error
 	OrderLineItemSoftDeleteByID(ctx context.Context, id string) error
 	OrderLineItemUpdate(ctx context.Context, orderLineItem OrderLineItemInterface) error
