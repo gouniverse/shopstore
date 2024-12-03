@@ -327,6 +327,13 @@ type StoreInterface interface {
 	DB() *sql.DB
 	EnableDebug(debug bool, sqlLogger ...*slog.Logger)
 
+	CategoryTableName() string
+	DiscountTableName() string
+	MediaTableName() string
+	OrderTableName() string
+	OrderLineItemTableName() string
+	ProductTableName() string
+
 	CategoryCount(ctx context.Context, options CategoryQueryInterface) (int64, error)
 	CategoryCreate(context context.Context, category CategoryInterface) error
 	CategoryDelete(context context.Context, category CategoryInterface) error
