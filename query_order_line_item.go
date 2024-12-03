@@ -2,21 +2,6 @@ package shopstore
 
 import "errors"
 
-// type OrderLineItemQueryOptions struct {
-// 	ID                string
-// 	IDIn              string
-// 	OrderLineItemID   string
-// 	ProductID         string
-// 	Status            string
-// 	StatusIn          []string
-// 	Offset            int
-// 	Limit             int
-// 	SortOrderLineItem string
-// 	OrderBy   string
-// 	CountOnly         bool
-// 	WithDeleted       bool
-// }
-
 type OrderLineItemQueryInterface interface {
 	Validate() error
 

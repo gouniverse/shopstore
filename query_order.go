@@ -2,22 +2,6 @@ package shopstore
 
 import "errors"
 
-// type OrderQueryOptions struct {
-// 	ID           string
-// 	IDIn         string
-// 	CustomerID   string
-// 	Status       string
-// 	StatusIn     []string
-// 	CreatedAtGte string
-// 	CreatedAtLte string
-// 	Offset       int
-// 	Limit        int
-// 	SortOrder    string
-// 	OrderBy      string
-// 	CountOnly    bool
-// 	WithDeleted  bool
-// }
-
 type OrderQueryInterface interface {
 	Validate() error
 
