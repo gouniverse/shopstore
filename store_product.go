@@ -13,11 +13,15 @@ import (
 	"github.com/gouniverse/base/database"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 )
 
-func (store *Store) ProductCount(ctx context.Context, options ProductQueryOptions) (int64, error) {
-	options.CountOnly = true
-	q := store.productQuery(options)
+func (store *Store) ProductCount(ctx context.Context, options ProductQueryInterface) (int64, error) {
+	q, _, err := store.productQuery(options.SetCountOnly(true))
+
+	if err != nil {
+		return -1, err
+	}
 
 	sqlStr, params, errSql := q.Prepared(true).
 		Limit(1).
@@ -143,10 +147,9 @@ func (store *Store) ProductFindByID(ctx context.Context, id string) (ProductInte
 		return nil, errors.New("product id is empty")
 	}
 
-	list, err := store.ProductList(ctx, ProductQueryOptions{
-		ID:    id,
-		Limit: 1,
-	})
+	list, err := store.ProductList(ctx, NewProductQuery().
+		SetID(id).
+		SetLimit(1))
 
 	if err != nil {
 		return nil, err
@@ -159,10 +162,14 @@ func (store *Store) ProductFindByID(ctx context.Context, id string) (ProductInte
 	return nil, nil
 }
 
-func (store *Store) ProductList(ctx context.Context, options ProductQueryOptions) ([]ProductInterface, error) {
-	q := store.productQuery(options)
+func (store *Store) ProductList(ctx context.Context, options ProductQueryInterface) ([]ProductInterface, error) {
+	q, columns, err := store.productQuery(options)
 
-	sqlStr, _, errSql := q.Select().ToSQL()
+	if err != nil {
+		return []ProductInterface{}, err
+	}
+
+	sqlStr, sqlParams, errSql := q.Prepared(true).Select(columns...).ToSQL()
 
 	if errSql != nil {
 		return []ProductInterface{}, nil
@@ -170,7 +177,7 @@ func (store *Store) ProductList(ctx context.Context, options ProductQueryOptions
 
 	store.logSql("select", sqlStr)
 
-	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr)
+	modelMaps, err := database.SelectToMapString(store.toQuerableContext(ctx), sqlStr, sqlParams...)
 	if err != nil {
 		return []ProductInterface{}, err
 	}
@@ -222,66 +229,77 @@ func (store *Store) ProductUpdate(ctx context.Context, product ProductInterface)
 	return err
 }
 
-func (store *Store) productQuery(options ProductQueryOptions) *goqu.SelectDataset {
+func (store *Store) productQuery(options ProductQueryInterface) (selectDataset *goqu.SelectDataset, columns []any, err error) {
+	if options == nil {
+		return nil, nil, errors.New("product options cannot be nil")
+	}
+
+	if err := options.Validate(); err != nil {
+		return nil, nil, err
+	}
+
 	q := goqu.Dialect(store.dbDriverName).From(store.productTableName)
 
-	if options.ID != "" {
-		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID))
+	if options.HasID() {
+		q = q.Where(goqu.C(COLUMN_ID).Eq(options.ID()))
 	}
 
-	if len(options.IDIn) > 0 {
-		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn))
+	if options.HasIDIn() {
+		q = q.Where(goqu.C(COLUMN_ID).In(options.IDIn()))
 	}
 
-	if options.Title != "" {
-		q = q.Where(goqu.C(COLUMN_TITLE).Eq(options.Title))
+	if options.HasTitleLike() {
+		q = q.Where(goqu.C(COLUMN_TITLE).ILike(`%` + options.TitleLike() + `%`))
 	}
 
-	if options.Status != "" {
-		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status))
+	if options.HasStatus() {
+		q = q.Where(goqu.C(COLUMN_STATUS).Eq(options.Status()))
 	}
 
-	if len(options.StatusIn) > 0 {
-		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn))
+	if options.HasStatusIn() {
+		q = q.Where(goqu.C(COLUMN_STATUS).In(options.StatusIn()))
 	}
 
-	if options.CreatedAtGte != "" && options.CreatedAtLte != "" {
-		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte, options.CreatedAtLte)))
-	} else if options.CreatedAtGte != "" {
-		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte))
-	} else if options.CreatedAtLte != "" {
-		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte))
+	if options.HasCreatedAtGte() && options.HasCreatedAtLte() {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Between(exp.NewRangeVal(options.CreatedAtGte(), options.CreatedAtLte())))
+	} else if options.HasCreatedAtGte() {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Gte(options.CreatedAtGte()))
+	} else if options.HasCreatedAtLte() {
+		q = q.Where(goqu.C(COLUMN_CREATED_AT).Lte(options.CreatedAtLte()))
 	}
 
-	if !options.CountOnly {
-		if options.Limit > 0 {
-			q = q.Limit(uint(options.Limit))
+	if !options.IsCountOnly() {
+		if options.HasLimit() {
+			q = q.Limit(cast.ToUint(options.Limit()))
 		}
 
-		if options.Offset > 0 {
-			q = q.Offset(uint(options.Offset))
+		if options.HasOffset() {
+			q = q.Offset(cast.ToUint(options.Offset()))
 		}
 	}
 
-	sortOrder := sb.DESC
-	if options.SortOrder != "" {
-		sortOrder = options.SortOrder
-	}
+	sortOrder := lo.Ternary(options.HasSortDirection(), options.SortDirection(), sb.DESC)
 
-	if options.OrderBy != "" {
+	if options.HasOrderBy() {
 		if strings.EqualFold(sortOrder, sb.ASC) {
-			q = q.Order(goqu.I(options.OrderBy).Asc())
+			q = q.Order(goqu.I(options.OrderBy()).Asc())
 		} else {
-			q = q.Order(goqu.I(options.OrderBy).Desc())
+			q = q.Order(goqu.I(options.OrderBy()).Desc())
 		}
 	}
 
-	if options.WithDeleted {
-		return q
+	columns = []any{}
+
+	for _, column := range options.Columns() {
+		columns = append(columns, column)
+	}
+
+	if options.SoftDeletedIncluded() {
+		return q, columns, nil // soft deleted products requested specifically
 	}
 
 	softDeleted := goqu.C(COLUMN_DELETED_AT).
 		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
 
-	return q.Where(softDeleted)
+	return q.Where(softDeleted), columns, nil
 }

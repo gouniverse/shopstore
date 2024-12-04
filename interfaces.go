@@ -385,12 +385,12 @@ type StoreInterface interface {
 	OrderLineItemSoftDeleteByID(ctx context.Context, id string) error
 	OrderLineItemUpdate(ctx context.Context, orderLineItem OrderLineItemInterface) error
 
-	ProductCount(ctx context.Context, options ProductQueryOptions) (int64, error)
+	ProductCount(ctx context.Context, options ProductQueryInterface) (int64, error)
 	ProductCreate(ctx context.Context, product ProductInterface) error
 	ProductDelete(ctx context.Context, product ProductInterface) error
 	ProductDeleteByID(ctx context.Context, productID string) error
 	ProductFindByID(ctx context.Context, productID string) (ProductInterface, error)
-	ProductList(ctx context.Context, options ProductQueryOptions) ([]ProductInterface, error)
+	ProductList(ctx context.Context, options ProductQueryInterface) ([]ProductInterface, error)
 	ProductSoftDelete(ctx context.Context, product ProductInterface) error
 	ProductSoftDeleteByID(ctx context.Context, productID string) error
 	ProductUpdate(ctx context.Context, product ProductInterface) error
