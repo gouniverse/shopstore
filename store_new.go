@@ -31,6 +31,10 @@ func NewStore(opts NewStoreOptions) (*Store, error) {
 		return nil, errors.New("shop store: DiscountTableName is required")
 	}
 
+	if opts.MediaTableName == "" {
+		return nil, errors.New("shop store: MediaTableName is required")
+	}
+
 	if opts.OrderTableName == "" {
 		return nil, errors.New("shop store: OrderTableName is required")
 	}
