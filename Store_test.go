@@ -62,21 +62,7 @@ func initStore(filepath string) (StoreInterface, error) {
 }
 
 func TestStoreCategoryCreate(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -90,7 +76,7 @@ func TestStoreCategoryCreate(t *testing.T) {
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	err = store.CategoryCreate(database.Context(context.Background(), db), category)
+	err = store.CategoryCreate(database.Context(context.Background(), store.DB()), category)
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -98,21 +84,7 @@ func TestStoreCategoryCreate(t *testing.T) {
 }
 
 func TestStoreCategoryDelete(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -126,7 +98,7 @@ func TestStoreCategoryDelete(t *testing.T) {
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	ctx := database.Context(context.Background(), db)
+	ctx := database.Context(context.Background(), store.DB())
 
 	err = store.CategoryCreate(ctx, category)
 
@@ -152,35 +124,17 @@ func TestStoreCategoryDelete(t *testing.T) {
 }
 
 func TestStoreCategoryDeleteByID(t *testing.T) {
-	db, err := initDB(":memory:")
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	if store == nil {
-		t.Fatal("unexpected nil store")
 	}
 
 	category := NewCategory().
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	ctx := database.Context(context.Background(), db)
+	ctx := database.Context(context.Background(), store.DB())
 
 	err = store.CategoryCreate(ctx, category)
 
@@ -206,21 +160,7 @@ func TestStoreCategoryDeleteByID(t *testing.T) {
 }
 
 func TestStoreCategoryFindByID(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -234,7 +174,7 @@ func TestStoreCategoryFindByID(t *testing.T) {
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	ctx := database.Context(context.Background(), db)
+	ctx := database.Context(context.Background(), store.DB())
 
 	err = store.CategoryCreate(ctx, category)
 
@@ -275,21 +215,7 @@ func TestStoreCategoryFindByID(t *testing.T) {
 }
 
 func TestStoreCategorySoftDelete(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -303,7 +229,7 @@ func TestStoreCategorySoftDelete(t *testing.T) {
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	ctx := database.Context(context.Background(), db)
+	ctx := database.Context(context.Background(), store.DB())
 
 	err = store.CategoryCreate(ctx, category)
 
@@ -348,21 +274,7 @@ func TestStoreCategorySoftDelete(t *testing.T) {
 }
 
 func TestStoreCategorySoftDeleteByID(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -376,7 +288,7 @@ func TestStoreCategorySoftDeleteByID(t *testing.T) {
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	ctx := database.Context(context.Background(), db)
+	ctx := database.Context(context.Background(), store.DB())
 
 	err = store.CategoryCreate(ctx, category)
 
@@ -421,21 +333,7 @@ func TestStoreCategorySoftDeleteByID(t *testing.T) {
 }
 
 func TestStoreCategoryUpdate(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -449,7 +347,7 @@ func TestStoreCategoryUpdate(t *testing.T) {
 		SetStatus(CATEGORY_STATUS_DRAFT).
 		SetTitle("CATEGORY_TITLE")
 
-	ctx := database.Context(context.Background(), db)
+	ctx := database.Context(context.Background(), store.DB())
 
 	err = store.CategoryCreate(ctx, category)
 
@@ -477,21 +375,7 @@ func TestStoreCategoryUpdate(t *testing.T) {
 }
 
 func TestStoreDiscountCreate(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_create",
-		DiscountTableName:      "shop_discount_create",
-		OrderTableName:         "shop_order_create",
-		OrderLineItemTableName: "shop_order_line_item_create",
-		ProductTableName:       "shop_product_create",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -514,21 +398,7 @@ func TestStoreDiscountCreate(t *testing.T) {
 }
 
 func TestStoreDiscountDelete(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_delete",
-		DiscountTableName:      "shop_discount_delete",
-		OrderTableName:         "shop_order_delete",
-		OrderLineItemTableName: "shop_order_line_item_delete",
-		ProductTableName:       "shop_product_delete",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -570,21 +440,7 @@ func TestStoreDiscountDelete(t *testing.T) {
 }
 
 func TestStoreDiscountDeleteByID(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_delete_by_id",
-		DiscountTableName:      "shop_discount_delete_by_id",
-		OrderTableName:         "shop_order_delete_by_id",
-		OrderLineItemTableName: "shop_order_line_item_delete_by_id",
-		ProductTableName:       "shop_product_delete_by_id",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -626,21 +482,7 @@ func TestStoreDiscountDeleteByID(t *testing.T) {
 }
 
 func TestStoreDiscountFindByID(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_find_by_id",
-		DiscountTableName:      "shop_discount_find_by_id",
-		OrderTableName:         "shop_order_find_by_id",
-		OrderLineItemTableName: "shop_order_line_item_find_by_id",
-		ProductTableName:       "shop_product_find_by_id",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -725,21 +567,7 @@ func TestStoreDiscountFindByID(t *testing.T) {
 }
 
 func TestStoreDiscountSoftDelete(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_soft_delete",
-		DiscountTableName:      "shop_discount_soft_delete",
-		OrderTableName:         "shop_order_soft_delete",
-		OrderLineItemTableName: "shop_order_line_item_soft_delete",
-		ProductTableName:       "shop_product_soft_delete",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
@@ -794,21 +622,7 @@ func TestStoreDiscountSoftDelete(t *testing.T) {
 }
 
 func TestStoreDiscountUpdate(t *testing.T) {
-	db, err := initDB(":memory:")
-
-	if err != nil {
-		t.Fatal("unexpected error:", err)
-	}
-
-	store, err := NewStore(NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "shop_category_update",
-		DiscountTableName:      "shop_discount_update",
-		OrderTableName:         "shop_order_update",
-		OrderLineItemTableName: "shop_order_line_item_update",
-		ProductTableName:       "shop_product_update",
-		AutomigrateEnabled:     true,
-	})
+	store, err := initStore(":memory:")
 
 	if err != nil {
 		t.Fatal("unexpected error:", err)
