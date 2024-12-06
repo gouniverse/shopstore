@@ -22,9 +22,13 @@ go get -u github.com/gouniverse/shopstore
 
 ```golang
 ShopStore, err := shopstore.NewStore(shopstore.NewStoreOptions{
-  DB:                 Database.DB(),
-  DiscountTableName:  "shop_discount",
-  OrderTableName:     "shop_order",
+  DB:                     Database.DB(),
+  CategoryTableName:      "shop_category",
+  DiscountTableName:      "shop_discount",
+  MediaTableName:         "shop_media",
+  OrderTableName:         "shop_order",
+  OrderLineItemTableName: "shop_order_line_item",
+  ProductTableName:       "shop_product",
   AutomigrateEnabled: true,
 })
 
