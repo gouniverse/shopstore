@@ -5,6 +5,7 @@ import (
 	"github.com/gouniverse/dataobject"
 	"github.com/gouniverse/maputils"
 	"github.com/gouniverse/sb"
+	"github.com/gouniverse/strutils"
 	"github.com/gouniverse/uid"
 	"github.com/gouniverse/utils"
 	"github.com/spf13/cast"
@@ -66,6 +67,11 @@ func (product *Product) IsSoftDeleted() bool {
 
 func (product *Product) IsFree() bool {
 	return cast.ToInt(product.Price()) == 0
+}
+
+func (product *Product) Slug() string {
+	title := product.Title()
+	return strutils.Slugify(title)
 }
 
 // == GETTERS & SETTERS ========================================================

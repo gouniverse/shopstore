@@ -274,6 +274,7 @@ type ProductInterface interface {
 	IsDraft() bool
 	IsSoftDeleted() bool
 	IsFree() bool
+	Slug() string
 
 	// Setters and Getters
 
