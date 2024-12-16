@@ -71,7 +71,7 @@ func (product *Product) IsFree() bool {
 
 func (product *Product) Slug() string {
 	title := product.Title()
-	return strutils.Slugify(title)
+	return strutils.Slugify(title, '-')
 }
 
 // == GETTERS & SETTERS ========================================================

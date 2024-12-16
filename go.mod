@@ -11,6 +11,7 @@ require (
 	github.com/gouniverse/hb v1.80.1
 	github.com/gouniverse/maputils v0.7.0
 	github.com/gouniverse/sb v0.8.0
+	github.com/gouniverse/strutils v0.6.0
 	github.com/gouniverse/uid v1.5.0
 	github.com/gouniverse/utils v1.45.4
 	github.com/samber/lo v1.47.0

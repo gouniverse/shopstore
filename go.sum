@@ -60,6 +60,8 @@ github.com/gouniverse/maputils v0.7.0 h1:qoJnY8tY5gkdyuIkwGHJYwH7It7LnCevxU+P+c4
 github.com/gouniverse/maputils v0.7.0/go.mod h1:s8HbjSvEqBl+R+bFCvFd+mY07bx7EQM5YhIjDgF26Q0=
 github.com/gouniverse/sb v0.8.0 h1:XrHK15JKCPtvpHR8QEc+stLBVsLH1KjtkPOdzMbSIh0=
 github.com/gouniverse/sb v0.8.0/go.mod h1:REyzsOC67VFYEzBOFEJSojkQNNyBZdcyQpNyLSHvm0U=
+github.com/gouniverse/strutils v0.6.0 h1:isC0vv5TDYNW1IfPyOUB39JyBSWgHimDcsf+Bp9sB+A=
+github.com/gouniverse/strutils v0.6.0/go.mod h1:NfVT8LbENvAT39bFtjuxQLFq6A4wHDJuyqcmsys1o0A=
 github.com/gouniverse/uid v1.5.0 h1:evyGegnY7+KeYirDhJntI9xmODf8jPMQw8DlMpQIPnM=
 github.com/gouniverse/uid v1.5.0/go.mod h1:06dzYTyBLOu+iRlKZ8GxzEfgDSLyoZwgKns9Fcvt7G4=
 github.com/gouniverse/utils v1.45.4 h1:WrOSdTJH+C0j7+wDypb6+cFm35anI/X6DR+hWW/s2hM=
