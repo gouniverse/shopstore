@@ -46,6 +46,8 @@ github.com/gouniverse/api v1.6.0 h1:qIW5NHJna/Qd6AGoRJm1HhPAcA3QTEzdCe1FMQ+VwMI=
 github.com/gouniverse/api v1.6.0/go.mod h1:rm5dXyrksJSHwUCVEs9+TenJeBBC34R4FPjtwZ/TvQ8=
 github.com/gouniverse/base v0.0.7 h1:q37THksIcwQH3dhQ9eBB40AjttBSql7C9ybJk9UXtJU=
 github.com/gouniverse/base v0.0.7/go.mod h1:jFH48RoG8ri9ijuHpuPnj7CX6FhePpFeGj6rQNSJeVQ=
+github.com/gouniverse/bs v0.13.0 h1:+YEybVDZo4tPs6L+9cabuwAdVblL4+1Y14CNEarYSNA=
+github.com/gouniverse/bs v0.13.0/go.mod h1:pwmAi5bTLhl9zxxQw41C51Q1/LeMnEewFBoJ2qkq9V8=
 github.com/gouniverse/cdn v1.5.0 h1:fAyFCOjlIBeDtanbGFlBlkvbfGQZswSRoWoA0vJrQFw=
 github.com/gouniverse/cdn v1.5.0/go.mod h1:sVnmFvpaG04winyiB2zgpfsXU0FUtIu5e2nDoO6kqVM=
 github.com/gouniverse/crypto v0.2.0 h1:7ppqn9FrwrlC6nTfgVBnEop5cKBFNEZyP5yXoUH7MZ0=
@@ -54,6 +56,8 @@ github.com/gouniverse/dataobject v0.3.0 h1:4m6zH8q3/Z159MrkX64gZO884SC2RE35FFzM1
 github.com/gouniverse/dataobject v0.3.0/go.mod h1:kGYa0bv14xCmkTCW2CpF9dIkh+S1N3O04c5eJY1jFqg=
 github.com/gouniverse/envenc v0.8.0 h1:pt1DVRrRXdxk4eA6vm0SBCdPrgXaF1EsDUq6tgXfpFs=
 github.com/gouniverse/envenc v0.8.0/go.mod h1:bdRPykXWVTAJfpEDht/iMqFtj/iigw2dqJci5dp/f8A=
+github.com/gouniverse/form v0.15.4 h1:GpPKxM2ZlgMNZ2481zUgsO96n71RbtQ6iROAECvh374=
+github.com/gouniverse/form v0.15.4/go.mod h1:S6DTuDhSSylv9fN+SbIHW17z+9QDBelG40c2Wp0s3wM=
 github.com/gouniverse/hb v1.80.1 h1:RXlZiPSnP6rlOYmjznB/xGG67wrciR3rqZck3eBJHJs=
 github.com/gouniverse/hb v1.80.1/go.mod h1:WDUCGoptHp/fAYT634lQ2846sGx88yXOOWMvlEaezYM=
 github.com/gouniverse/maputils v0.7.0 h1:qoJnY8tY5gkdyuIkwGHJYwH7It7LnCevxU+P+c4nU/Y=
