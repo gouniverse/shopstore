@@ -332,6 +332,10 @@ func (store *Store) sqlProductTableCreate() string {
 			Type: sb.COLUMN_TYPE_TEXT,
 		}).
 		Column(sb.Column{
+			Name: COLUMN_SHORT_DESCRIPTION,
+			Type: sb.COLUMN_TYPE_TEXT,
+		}).
+		Column(sb.Column{
 			Name:   COLUMN_QUANTITY,
 			Type:   sb.COLUMN_TYPE_INTEGER,
 			Length: 10,

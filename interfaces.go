@@ -320,6 +320,9 @@ type ProductInterface interface {
 	SoftDeletedAtCarbon() carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) ProductInterface
 
+	ShortDescription() string
+	SetShortDescription(shortDescription string) ProductInterface
+
 	Status() string
 	SetStatus(status string) ProductInterface
 

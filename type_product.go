@@ -89,6 +89,15 @@ func (product *Product) SetCreatedAt(createdAt string) ProductInterface {
 	return product
 }
 
+func (product *Product) Description() string {
+	return product.Get(COLUMN_DESCRIPTION)
+}
+
+func (product *Product) SetDescription(description string) ProductInterface {
+	product.Set(COLUMN_DESCRIPTION, description)
+	return product
+}
+
 func (product *Product) ID() string {
 	return product.Get(COLUMN_ID)
 }
@@ -165,28 +174,6 @@ func (product *Product) UpsertMetas(metas map[string]string) error {
 	return product.SetMetas(currentMetas)
 }
 
-func (product *Product) SoftDeletedAt() string {
-	return product.Get(COLUMN_SOFT_DELETED_AT)
-}
-
-func (product *Product) SoftDeletedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(product.SoftDeletedAt(), carbon.UTC)
-}
-
-func (product *Product) SetSoftDeletedAt(deletedAt string) ProductInterface {
-	product.Set(COLUMN_SOFT_DELETED_AT, deletedAt)
-	return product
-}
-
-func (product *Product) Status() string {
-	return product.Get(COLUMN_STATUS)
-}
-
-func (product *Product) SetStatus(status string) ProductInterface {
-	product.Set(COLUMN_STATUS, status)
-	return product
-}
-
 func (product *Product) Price() string {
 	return product.Get(COLUMN_PRICE)
 }
@@ -225,21 +212,43 @@ func (product *Product) SetQuantityInt(quantity int64) ProductInterface {
 	return product
 }
 
+func (product *Product) ShortDescription() string {
+	return product.Get(COLUMN_SHORT_DESCRIPTION)
+}
+
+func (product *Product) SetShortDescription(shortDescription string) ProductInterface {
+	product.Set(COLUMN_SHORT_DESCRIPTION, shortDescription)
+	return product
+}
+
+func (product *Product) SoftDeletedAt() string {
+	return product.Get(COLUMN_SOFT_DELETED_AT)
+}
+
+func (product *Product) SoftDeletedAtCarbon() carbon.Carbon {
+	return carbon.NewCarbon().Parse(product.SoftDeletedAt(), carbon.UTC)
+}
+
+func (product *Product) SetSoftDeletedAt(deletedAt string) ProductInterface {
+	product.Set(COLUMN_SOFT_DELETED_AT, deletedAt)
+	return product
+}
+
+func (product *Product) Status() string {
+	return product.Get(COLUMN_STATUS)
+}
+
+func (product *Product) SetStatus(status string) ProductInterface {
+	product.Set(COLUMN_STATUS, status)
+	return product
+}
+
 func (product *Product) Title() string {
 	return product.Get(COLUMN_TITLE)
 }
 
 func (product *Product) SetTitle(title string) ProductInterface {
 	product.Set(COLUMN_TITLE, title)
-	return product
-}
-
-func (product *Product) Description() string {
-	return product.Get(COLUMN_DESCRIPTION)
-}
-
-func (product *Product) SetDescription(description string) ProductInterface {
-	product.Set(COLUMN_DESCRIPTION, description)
 	return product
 }
 
