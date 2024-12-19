@@ -37,9 +37,6 @@ type CategoryInterface interface {
 	ParentID() string
 	SetParentID(parentID string) CategoryInterface
 
-	// Slug() string
-	// SetSlug(slug string) CatregoryInterface
-
 	Status() string
 	SetStatus(status string) CategoryInterface
 
@@ -64,30 +61,41 @@ type DiscountInterface interface {
 
 	Amount() float64
 	SetAmount(amount float64) DiscountInterface
+
 	Code() string
 	SetCode(code string) DiscountInterface
+
 	CreatedAt() string
 	CreatedAtCarbon() carbon.Carbon
 	SetCreatedAt(createdAt string) DiscountInterface
-	DeletedAt() string
-	DeletedAtCarbon() carbon.Carbon
-	SetDeletedAt(deletedAt string) DiscountInterface
+
 	Description() string
 	SetDescription(description string) DiscountInterface
+
 	EndsAt() string
 	EndsAtCarbon() carbon.Carbon
 	SetEndsAt(endsAt string) DiscountInterface
+
 	ID() string
 	SetID(id string) DiscountInterface
+
+	SoftDeletedAt() string
+	SoftDeletedAtCarbon() carbon.Carbon
+	SetSoftDeletedAt(deletedAt string) DiscountInterface
+
 	StartsAt() string
 	StartsAtCarbon() carbon.Carbon
 	SetStartsAt(startsAt string) DiscountInterface
+
 	Status() string
 	SetStatus(status string) DiscountInterface
+
 	Title() string
 	SetTitle(title string) DiscountInterface
+
 	Type() string
 	SetType(type_ string) DiscountInterface
+
 	UpdatedAt() string
 	UpdatedAtCarbon() carbon.Carbon
 	SetUpdatedAt(updatedAt string) DiscountInterface
@@ -174,10 +182,6 @@ type OrderInterface interface {
 	CustomerID() string
 	SetCustomerID(customerID string) OrderInterface
 
-	DeletedAt() string
-	DeletedAtCarbon() carbon.Carbon
-	SetDeletedAt(deletedAt string) OrderInterface
-
 	ID() string
 	SetID(id string) OrderInterface
 
@@ -200,6 +204,10 @@ type OrderInterface interface {
 	QuantityInt() int64
 	SetQuantityInt(quantity int64) OrderInterface
 
+	SoftDeletedAt() string
+	SoftDeletedAtCarbon() carbon.Carbon
+	SetSoftDeletedAt(deletedAt string) OrderInterface
+
 	Status() string
 	SetStatus(status string) OrderInterface
 
@@ -216,10 +224,6 @@ type OrderLineItemInterface interface {
 	CreatedAt() string
 	CreatedAtCarbon() carbon.Carbon
 	SetCreatedAt(createdAt string) OrderLineItemInterface
-
-	DeletedAt() string
-	DeletedAtCarbon() carbon.Carbon
-	SetDeletedAt(deletedAt string) OrderLineItemInterface
 
 	ID() string
 	SetID(id string) OrderLineItemInterface
@@ -250,6 +254,10 @@ type OrderLineItemInterface interface {
 
 	QuantityInt() int64
 	SetQuantityInt(quantity int64) OrderLineItemInterface
+
+	SoftDeletedAt() string
+	SoftDeletedAtCarbon() carbon.Carbon
+	SetSoftDeletedAt(deletedAt string) OrderLineItemInterface
 
 	Status() string
 	SetStatus(status string) OrderLineItemInterface
@@ -282,10 +290,6 @@ type ProductInterface interface {
 	CreatedAtCarbon() carbon.Carbon
 	SetCreatedAt(createdAt string) ProductInterface
 
-	DeletedAt() string
-	DeletedAtCarbon() carbon.Carbon
-	SetDeletedAt(deletedAt string) ProductInterface
-
 	Description() string
 	SetDescription(description string) ProductInterface
 
@@ -311,6 +315,10 @@ type ProductInterface interface {
 	SetQuantity(quantity string) ProductInterface
 	QuantityInt() int64
 	SetQuantityInt(quantity int64) ProductInterface
+
+	SoftDeletedAt() string
+	SoftDeletedAtCarbon() carbon.Carbon
+	SetSoftDeletedAt(deletedAt string) ProductInterface
 
 	Status() string
 	SetStatus(status string) ProductInterface

@@ -61,7 +61,7 @@ func (store *Store) DiscountCount(ctx context.Context, options DiscountQueryInte
 func (store *Store) DiscountCreate(ctx context.Context, discount DiscountInterface) error {
 	discount.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	discount.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	discount.SetDeletedAt(sb.MAX_DATETIME)
+	discount.SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	data := discount.Data()
 
@@ -201,7 +201,7 @@ func (store *Store) DiscountSoftDelete(ctx context.Context, discount DiscountInt
 		return errors.New("discount is nil")
 	}
 
-	discount.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	discount.SetSoftDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
 	return store.DiscountUpdate(ctx, discount)
 }
@@ -324,7 +324,7 @@ func (store *Store) discountQuery(options DiscountQueryInterface) (selectDataset
 		return q, columns, nil // soft deleted discounts requested specifically
 	}
 
-	softDeleted := goqu.C(COLUMN_DELETED_AT).
+	softDeleted := goqu.C(COLUMN_SOFT_DELETED_AT).
 		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
 
 	return q.Where(softDeleted), columns, nil

@@ -28,7 +28,7 @@ func NewOrder() OrderInterface {
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
-		SetDeletedAt(sb.MAX_DATETIME)
+		SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	_ = o.SetMetas(map[string]string{})
 
@@ -112,19 +112,6 @@ func (order *Order) CustomerID() string {
 
 func (order *Order) SetCustomerID(id string) OrderInterface {
 	order.Set(COLUMN_CUSTOMER_ID, id)
-	return order
-}
-
-func (order *Order) DeletedAt() string {
-	return order.Get(COLUMN_DELETED_AT)
-}
-
-func (order *Order) DeletedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(order.DeletedAt(), carbon.UTC)
-}
-
-func (order *Order) SetDeletedAt(deletedAt string) OrderInterface {
-	order.Set(COLUMN_DELETED_AT, deletedAt)
 	return order
 }
 
@@ -248,6 +235,19 @@ func (order *Order) QuantityInt() int64 {
 
 func (order *Order) SetQuantityInt(quantity int64) OrderInterface {
 	order.SetQuantity(utils.ToString(quantity))
+	return order
+}
+
+func (order *Order) SoftDeletedAt() string {
+	return order.Get(COLUMN_SOFT_DELETED_AT)
+}
+
+func (order *Order) SoftDeletedAtCarbon() carbon.Carbon {
+	return carbon.NewCarbon().Parse(order.SoftDeletedAt(), carbon.UTC)
+}
+
+func (order *Order) SetSoftDeletedAt(deletedAt string) OrderInterface {
+	order.Set(COLUMN_SOFT_DELETED_AT, deletedAt)
 	return order
 }
 

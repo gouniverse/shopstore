@@ -63,7 +63,7 @@ func (store *Store) ProductCreate(ctx context.Context, product ProductInterface)
 
 	product.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	product.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	product.SetDeletedAt(sb.MAX_DATETIME)
+	product.SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	data := product.Data()
 
@@ -127,7 +127,7 @@ func (store *Store) ProductSoftDelete(ctx context.Context, product ProductInterf
 		return errors.New("product is empty")
 	}
 
-	product.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	product.SetSoftDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
 	return store.ProductUpdate(ctx, product)
 }
@@ -298,7 +298,7 @@ func (store *Store) productQuery(options ProductQueryInterface) (selectDataset *
 		return q, columns, nil // soft deleted products requested specifically
 	}
 
-	softDeleted := goqu.C(COLUMN_DELETED_AT).
+	softDeleted := goqu.C(COLUMN_SOFT_DELETED_AT).
 		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
 
 	return q.Where(softDeleted), columns, nil

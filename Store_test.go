@@ -556,12 +556,8 @@ func TestStoreDiscountFindByID(t *testing.T) {
 		t.Fatal("Exam end date MUST BE '2022-01-01 23:59:59', found: ", discountFound.EndsAt())
 	}
 
-	// if examFound.Memo() != "test memo" {
-	// 	t.Fatal("Exam memo MUST BE 'test memo', found: ", examFound.Memo())
-	// }
-
-	if !strings.Contains(discountFound.DeletedAt(), sb.MAX_DATETIME) {
-		t.Fatal("Exam MUST NOT be soft deleted", discountFound.DeletedAt())
+	if !strings.Contains(discountFound.SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Exam MUST NOT be soft deleted", discountFound.SoftDeletedAt())
 		return
 	}
 }

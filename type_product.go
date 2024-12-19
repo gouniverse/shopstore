@@ -34,7 +34,7 @@ func NewProduct() ProductInterface {
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
-		SetDeletedAt(sb.MAX_DATETIME)
+		SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	_ = o.SetMetas(map[string]string{})
 
@@ -62,7 +62,7 @@ func (product *Product) IsDraft() bool {
 }
 
 func (product *Product) IsSoftDeleted() bool {
-	return product.DeletedAtCarbon().Compare("<", carbon.Now(carbon.UTC))
+	return product.SoftDeletedAtCarbon().Compare("<", carbon.Now(carbon.UTC))
 }
 
 func (product *Product) IsFree() bool {
@@ -86,19 +86,6 @@ func (product *Product) CreatedAtCarbon() carbon.Carbon {
 
 func (product *Product) SetCreatedAt(createdAt string) ProductInterface {
 	product.Set(COLUMN_CREATED_AT, createdAt)
-	return product
-}
-
-func (product *Product) DeletedAt() string {
-	return product.Get(COLUMN_DELETED_AT)
-}
-
-func (product *Product) DeletedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(product.DeletedAt(), carbon.UTC)
-}
-
-func (product *Product) SetDeletedAt(deletedAt string) ProductInterface {
-	product.Set(COLUMN_DELETED_AT, deletedAt)
 	return product
 }
 
@@ -176,6 +163,19 @@ func (product *Product) UpsertMetas(metas map[string]string) error {
 	}
 
 	return product.SetMetas(currentMetas)
+}
+
+func (product *Product) SoftDeletedAt() string {
+	return product.Get(COLUMN_SOFT_DELETED_AT)
+}
+
+func (product *Product) SoftDeletedAtCarbon() carbon.Carbon {
+	return carbon.NewCarbon().Parse(product.SoftDeletedAt(), carbon.UTC)
+}
+
+func (product *Product) SetSoftDeletedAt(deletedAt string) ProductInterface {
+	product.Set(COLUMN_SOFT_DELETED_AT, deletedAt)
+	return product
 }
 
 func (product *Product) Status() string {

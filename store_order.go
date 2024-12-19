@@ -63,7 +63,7 @@ func (store *Store) OrderCount(ctx context.Context, options OrderQueryInterface)
 func (store *Store) OrderCreate(ctx context.Context, order OrderInterface) error {
 	order.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	order.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	order.SetDeletedAt(sb.MAX_DATETIME)
+	order.SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	data := order.Data()
 
@@ -125,7 +125,7 @@ func (store *Store) OrderSoftDelete(ctx context.Context, order OrderInterface) e
 		return errors.New("order is empty")
 	}
 
-	order.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	order.SetSoftDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
 	return store.OrderUpdate(ctx, order)
 }
@@ -296,7 +296,7 @@ func (store *Store) orderQuery(options OrderQueryInterface) (selectDataset *goqu
 		return q, columns, nil // soft deleted orders requested specifically
 	}
 
-	softDeleted := goqu.C(COLUMN_DELETED_AT).
+	softDeleted := goqu.C(COLUMN_SOFT_DELETED_AT).
 		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
 
 	return q.Where(softDeleted), columns, nil
@@ -349,7 +349,7 @@ func (store *Store) OrderLineItemCreate(ctx context.Context, orderLineItem Order
 
 	orderLineItem.SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 	orderLineItem.SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
-	orderLineItem.SetDeletedAt(sb.MAX_DATETIME)
+	orderLineItem.SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	data := orderLineItem.Data()
 
@@ -458,7 +458,7 @@ func (store *Store) OrderLineItemSoftDelete(ctx context.Context, orderLineItem O
 		return errors.New("order line is empty")
 	}
 
-	orderLineItem.SetDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
+	orderLineItem.SetSoftDeletedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC))
 
 	return store.OrderLineItemUpdate(ctx, orderLineItem)
 }
@@ -575,7 +575,7 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryInterface) (sel
 		return q, columns, nil // soft deleted line items requested specifically
 	}
 
-	softDeleted := goqu.C(COLUMN_DELETED_AT).
+	softDeleted := goqu.C(COLUMN_SOFT_DELETED_AT).
 		Gt(carbon.Now(carbon.UTC).ToDateTimeString())
 
 	return q.Where(softDeleted), columns, nil

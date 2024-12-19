@@ -29,7 +29,7 @@ func NewOrderLineItem() OrderLineItemInterface {
 		SetMemo("").
 		SetCreatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
 		SetUpdatedAt(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)).
-		SetDeletedAt(sb.MAX_DATETIME)
+		SetSoftDeletedAt(sb.MAX_DATETIME)
 
 	_ = o.SetMetas(map[string]string{})
 
@@ -54,19 +54,6 @@ func (o *OrderLineItem) CreatedAtCarbon() carbon.Carbon {
 
 func (o *OrderLineItem) SetCreatedAt(createdAt string) OrderLineItemInterface {
 	o.Set(COLUMN_CREATED_AT, createdAt)
-	return o
-}
-
-func (o *OrderLineItem) DeletedAt() string {
-	return o.Get(COLUMN_DELETED_AT)
-}
-
-func (o *OrderLineItem) DeletedAtCarbon() carbon.Carbon {
-	return carbon.Parse(o.DeletedAt(), carbon.UTC)
-}
-
-func (o *OrderLineItem) SetDeletedAt(deletedAt string) OrderLineItemInterface {
-	o.Set(COLUMN_DELETED_AT, deletedAt)
 	return o
 }
 
@@ -201,6 +188,19 @@ func (o *OrderLineItem) QuantityInt() int64 {
 
 func (o *OrderLineItem) SetQuantityInt(quantity int64) OrderLineItemInterface {
 	o.SetQuantity(utils.ToString(quantity))
+	return o
+}
+
+func (o *OrderLineItem) SoftDeletedAt() string {
+	return o.Get(COLUMN_SOFT_DELETED_AT)
+}
+
+func (o *OrderLineItem) SoftDeletedAtCarbon() carbon.Carbon {
+	return carbon.Parse(o.SoftDeletedAt(), carbon.UTC)
+}
+
+func (o *OrderLineItem) SetSoftDeletedAt(deletedAt string) OrderLineItemInterface {
+	o.Set(COLUMN_SOFT_DELETED_AT, deletedAt)
 	return o
 }
 

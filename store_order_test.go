@@ -190,8 +190,8 @@ func TestStoreOrderFindByID(t *testing.T) {
 		t.Fatal("Order size meta MUST BE 'xxl', found: ", orderFound.Meta("xxl"))
 	}
 
-	if !strings.Contains(orderFound.DeletedAt(), sb.MAX_DATETIME) {
-		t.Fatal("Order MUST NOT be soft deleted", orderFound.DeletedAt())
+	if !strings.Contains(orderFound.SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Order MUST NOT be soft deleted", orderFound.SoftDeletedAt())
 	}
 }
 
@@ -224,7 +224,7 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 		t.Fatal("unexpected error:", err)
 	}
 
-	if order.DeletedAt() != sb.MAX_DATETIME {
+	if order.SoftDeletedAt() != sb.MAX_DATETIME {
 		t.Fatal("Order MUST NOT be soft deleted")
 	}
 
@@ -251,8 +251,8 @@ func TestStoreOrderSoftDelete(t *testing.T) {
 		return
 	}
 
-	if strings.Contains(orderFindWithDeleted[0].DeletedAt(), sb.NULL_DATETIME) {
-		t.Fatal("Order MUST be soft deleted", orderFound.DeletedAt())
+	if strings.Contains(orderFindWithDeleted[0].SoftDeletedAt(), sb.MAX_DATETIME) {
+		t.Fatal("Order MUST be soft deleted", orderFound.SoftDeletedAt())
 	}
 
 }

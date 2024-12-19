@@ -113,7 +113,7 @@ func (st *Store) sqlDiscountTableCreate() string {
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: COLUMN_DELETED_AT,
+			Name: COLUMN_SOFT_DELETED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		CreateIfNotExists()
@@ -245,7 +245,7 @@ func (store *Store) sqlOrderLineItemTableCreate() string {
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: COLUMN_DELETED_AT,
+			Name: COLUMN_SOFT_DELETED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		CreateIfNotExists()
@@ -300,7 +300,7 @@ func (store *Store) sqlOrderTableCreate() string {
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: COLUMN_DELETED_AT,
+			Name: COLUMN_SOFT_DELETED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		CreateIfNotExists()
@@ -359,7 +359,7 @@ func (store *Store) sqlProductTableCreate() string {
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		Column(sb.Column{
-			Name: COLUMN_DELETED_AT,
+			Name: COLUMN_SOFT_DELETED_AT,
 			Type: sb.COLUMN_TYPE_DATETIME,
 		}).
 		CreateIfNotExists()
