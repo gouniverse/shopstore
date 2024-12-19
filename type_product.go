@@ -29,6 +29,7 @@ func NewProduct() ProductInterface {
 		SetStatus(PRODUCT_STATUS_DRAFT).
 		SetTitle("").
 		SetDescription("").
+		SetShortDescription("").
 		SetQuantityInt(0). // By default 0
 		SetPriceFloat(0).  // Free. By default
 		SetMemo("").
