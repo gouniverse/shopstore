@@ -79,6 +79,18 @@ type DiscountInterface interface {
 	ID() string
 	SetID(id string) DiscountInterface
 
+	Memo() string
+	SetMemo(memo string) DiscountInterface
+
+	Meta(name string) string
+	MetaRemove(name string) error
+	SetMeta(name string, value string) error
+
+	Metas() (map[string]string, error)
+	MetasRemove(names []string) error
+	MetasUpsert(metas map[string]string) error
+	SetMetas(metas map[string]string) error
+
 	SoftDeletedAt() string
 	SoftDeletedAtCarbon() carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) DiscountInterface

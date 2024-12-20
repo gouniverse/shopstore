@@ -3,6 +3,7 @@ package shopstore
 import (
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/dataobject"
+	"github.com/gouniverse/maputils"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/uid"
 	"github.com/gouniverse/utils"
@@ -135,6 +136,100 @@ func (o *Discount) ID() string {
 func (o *Discount) SetID(id string) DiscountInterface {
 	o.Set(COLUMN_ID, id)
 	return o
+}
+
+func (d *Discount) Memo() string {
+	return d.Get(COLUMN_MEMO)
+}
+
+func (d *Discount) SetMemo(memo string) DiscountInterface {
+	d.Set(COLUMN_MEMO, memo)
+	return d
+}
+
+func (d *Discount) Meta(name string) string {
+	metas, err := d.Metas()
+
+	if err != nil {
+		return ""
+	}
+
+	if value, exists := metas[name]; exists {
+		return value
+	}
+
+	return ""
+}
+
+func (d *Discount) MetaRemove(name string) error {
+	metas, err := d.Metas()
+
+	if err != nil {
+		return err
+	}
+
+	delete(metas, name)
+
+	return d.SetMetas(metas)
+}
+
+func (d *Discount) SetMeta(name string, value string) error {
+	return d.MetasUpsert(map[string]string{name: value})
+}
+
+func (d *Discount) Metas() (map[string]string, error) {
+	metasStr := d.Get(COLUMN_METAS)
+
+	if metasStr == "" {
+		metasStr = "{}"
+	}
+
+	metasJson, errJson := utils.FromJSON(metasStr, map[string]string{})
+	if errJson != nil {
+		return map[string]string{}, errJson
+	}
+
+	return maputils.MapStringAnyToMapStringString(metasJson.(map[string]any)), nil
+}
+
+func (d *Discount) MetasRemove(names []string) error {
+	for _, name := range names {
+		err := d.MetaRemove(name)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (d *Discount) MetasUpsert(metas map[string]string) error {
+	currentMetas, err := d.Metas()
+
+	if err != nil {
+		return err
+	}
+
+	for k, v := range metas {
+		currentMetas[k] = v
+	}
+
+	return d.SetMetas(currentMetas)
+}
+
+// SetMetas stores metas as json string
+// Warning: it overwrites any existing metas
+func (d *Discount) SetMetas(metas map[string]string) error {
+	mapString, err := utils.ToJSON(metas)
+
+	if err != nil {
+		return err
+	}
+
+	d.Set(COLUMN_METAS, mapString)
+
+	return nil
 }
 
 func (d *Discount) SoftDeletedAt() string {
