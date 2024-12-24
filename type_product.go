@@ -8,7 +8,6 @@ import (
 	"github.com/gouniverse/strutils"
 	"github.com/gouniverse/uid"
 	"github.com/gouniverse/utils"
-	"github.com/spf13/cast"
 )
 
 // == CLASS ====================================================================
@@ -67,7 +66,7 @@ func (product *Product) IsSoftDeleted() bool {
 }
 
 func (product *Product) IsFree() bool {
-	return cast.ToInt(product.Price()) == 0
+	return product.PriceFloat() <= 0
 }
 
 func (product *Product) Slug() string {
