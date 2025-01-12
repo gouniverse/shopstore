@@ -44,6 +44,10 @@ type OrderLineItemQueryInterface interface {
 	OrderID() string
 	SetOrderID(orderID string) OrderLineItemQueryInterface
 
+	HasOrderIDIn() bool
+	OrderIDIn() []string
+	SetOrderIDIn(orderIDIn []string) OrderLineItemQueryInterface
+
 	HasProductID() bool
 	ProductID() string
 	SetProductID(productID string) OrderLineItemQueryInterface
@@ -111,10 +115,6 @@ func (c *orderLineItemQueryImplementation) Validate() error {
 		return errors.New("orderLineItem query. offset must be greater than or equal to 0")
 	}
 
-	// if c.HasStatus() && c.Status() == "" {
-	// 	return errors.New("orderLineItem query. status cannot be empty")
-	// }
-
 	if c.HasOrderBy() && c.OrderBy() == "" {
 		return errors.New("orderLineItem query. order_by cannot be empty")
 	}
@@ -123,8 +123,18 @@ func (c *orderLineItemQueryImplementation) Validate() error {
 		return errors.New("orderLineItem query. order_id cannot be empty")
 	}
 
+	if c.HasOrderIDIn() {
+		if len(c.OrderIDIn()) < 1 {
+			return errors.New("orderLineItem query. order_id_in cannot be empty")
+		}
+	}
+
 	if c.HasProductID() && c.ProductID() == "" {
 		return errors.New("orderLineItem query. product_id cannot be empty")
+	}
+
+	if c.HasStatus() && c.Status() == "" {
+		return errors.New("orderLineItem query. status cannot be empty")
 	}
 
 	return nil
@@ -320,6 +330,24 @@ func (c *orderLineItemQueryImplementation) OrderID() string {
 
 func (c *orderLineItemQueryImplementation) SetOrderID(orderID string) OrderLineItemQueryInterface {
 	c.properties["order_id"] = orderID
+
+	return c
+}
+
+func (c *orderLineItemQueryImplementation) HasOrderIDIn() bool {
+	return c.hasProperty("order_id_in")
+}
+
+func (c *orderLineItemQueryImplementation) OrderIDIn() []string {
+	if !c.HasOrderIDIn() {
+		return []string{}
+	}
+
+	return c.properties["order_id_in"].([]string)
+}
+
+func (c *orderLineItemQueryImplementation) SetOrderIDIn(orderIDIn []string) OrderLineItemQueryInterface {
+	c.properties["order_id_in"] = orderIDIn
 
 	return c
 }

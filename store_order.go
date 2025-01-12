@@ -533,6 +533,10 @@ func (store *Store) orderLineItemQuery(options OrderLineItemQueryInterface) (sel
 		q = q.Where(goqu.C(COLUMN_ORDER_ID).Eq(options.OrderID()))
 	}
 
+	if options.HasOrderIDIn() {
+		q = q.Where(goqu.C(COLUMN_ORDER_ID).In(options.OrderIDIn()))
+	}
+
 	if options.HasProductID() {
 		q = q.Where(goqu.C(COLUMN_PRODUCT_ID).Eq(options.ProductID()))
 	}
