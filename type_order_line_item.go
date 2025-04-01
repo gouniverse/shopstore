@@ -48,7 +48,7 @@ func (o *OrderLineItem) CreatedAt() string {
 	return o.Get(COLUMN_CREATED_AT)
 }
 
-func (o *OrderLineItem) CreatedAtCarbon() carbon.Carbon {
+func (o *OrderLineItem) CreatedAtCarbon() *carbon.Carbon {
 	return carbon.Parse(o.CreatedAt(), carbon.UTC)
 }
 
@@ -195,7 +195,7 @@ func (o *OrderLineItem) SoftDeletedAt() string {
 	return o.Get(COLUMN_SOFT_DELETED_AT)
 }
 
-func (o *OrderLineItem) SoftDeletedAtCarbon() carbon.Carbon {
+func (o *OrderLineItem) SoftDeletedAtCarbon() *carbon.Carbon {
 	return carbon.Parse(o.SoftDeletedAt(), carbon.UTC)
 }
 
@@ -226,7 +226,7 @@ func (o *OrderLineItem) UpdatedAt() string {
 	return o.Get(COLUMN_UPDATED_AT)
 }
 
-func (o *OrderLineItem) UpdatedAtCarbon() carbon.Carbon {
+func (o *OrderLineItem) UpdatedAtCarbon() *carbon.Carbon {
 	return carbon.Parse(o.UpdatedAt(), carbon.UTC)
 }
 

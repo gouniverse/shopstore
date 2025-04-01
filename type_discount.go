@@ -97,7 +97,7 @@ func (d *Discount) CreatedAt() string {
 	return d.Get(COLUMN_CREATED_AT)
 }
 
-func (d *Discount) CreatedAtCarbon() carbon.Carbon {
+func (d *Discount) CreatedAtCarbon() *carbon.Carbon {
 	createdAt := d.CreatedAt()
 	return carbon.Parse(createdAt)
 }
@@ -120,7 +120,7 @@ func (d *Discount) EndsAt() string {
 	return d.Get(COLUMN_ENDS_AT)
 }
 
-func (d *Discount) EndsAtCarbon() carbon.Carbon {
+func (d *Discount) EndsAtCarbon() *carbon.Carbon {
 	endsAt := d.EndsAt()
 	return carbon.Parse(endsAt)
 }
@@ -239,7 +239,7 @@ func (d *Discount) SoftDeletedAt() string {
 	return d.Get(COLUMN_SOFT_DELETED_AT)
 }
 
-func (d *Discount) SoftDeletedAtCarbon() carbon.Carbon {
+func (d *Discount) SoftDeletedAtCarbon() *carbon.Carbon {
 	deletedAt := d.SoftDeletedAt()
 	return carbon.Parse(deletedAt)
 }
@@ -253,7 +253,7 @@ func (d *Discount) StartsAt() string {
 	return d.Get(COLUMN_STARTS_AT)
 }
 
-func (d *Discount) StartsAtCarbon() carbon.Carbon {
+func (d *Discount) StartsAtCarbon() *carbon.Carbon {
 	startsAt := d.StartsAt()
 	return carbon.Parse(startsAt)
 }
@@ -294,7 +294,7 @@ func (d *Discount) UpdatedAt() string {
 	return d.Get(COLUMN_UPDATED_AT)
 }
 
-func (d *Discount) UpdatedAtCarbon() carbon.Carbon {
+func (d *Discount) UpdatedAtCarbon() *carbon.Carbon {
 	updatedAt := d.UpdatedAt()
 	return carbon.Parse(updatedAt)
 }

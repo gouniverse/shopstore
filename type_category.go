@@ -65,8 +65,8 @@ func (category *Category) CreatedAt() string {
 	return category.Get(COLUMN_CREATED_AT)
 }
 
-func (category *Category) CreatedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(category.CreatedAt(), carbon.UTC)
+func (category *Category) CreatedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(category.CreatedAt(), carbon.UTC)
 }
 
 func (category *Category) SetCreatedAt(createdAt string) CategoryInterface {
@@ -186,8 +186,8 @@ func (category *Category) SetSoftDeletedAt(softDeletedAt string) CategoryInterfa
 	return category
 }
 
-func (category *Category) SoftDeletedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(category.SoftDeletedAt(), carbon.UTC)
+func (category *Category) SoftDeletedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(category.SoftDeletedAt(), carbon.UTC)
 }
 
 func (category *Category) Status() string {
@@ -212,8 +212,8 @@ func (category *Category) UpdatedAt() string {
 	return category.Get(COLUMN_UPDATED_AT)
 }
 
-func (category *Category) UpdatedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(category.UpdatedAt(), carbon.UTC)
+func (category *Category) UpdatedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(category.UpdatedAt(), carbon.UTC)
 }
 
 func (category *Category) SetUpdatedAt(updatedAt string) CategoryInterface {

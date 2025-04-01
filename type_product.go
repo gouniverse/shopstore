@@ -80,8 +80,8 @@ func (product *Product) CreatedAt() string {
 	return product.Get(COLUMN_CREATED_AT)
 }
 
-func (product *Product) CreatedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(product.CreatedAt(), carbon.UTC)
+func (product *Product) CreatedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(product.CreatedAt(), carbon.UTC)
 }
 
 func (product *Product) SetCreatedAt(createdAt string) ProductInterface {
@@ -225,8 +225,8 @@ func (product *Product) SoftDeletedAt() string {
 	return product.Get(COLUMN_SOFT_DELETED_AT)
 }
 
-func (product *Product) SoftDeletedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(product.SoftDeletedAt(), carbon.UTC)
+func (product *Product) SoftDeletedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(product.SoftDeletedAt(), carbon.UTC)
 }
 
 func (product *Product) SetSoftDeletedAt(deletedAt string) ProductInterface {
@@ -256,8 +256,8 @@ func (product *Product) UpdatedAt() string {
 	return product.Get(COLUMN_UPDATED_AT)
 }
 
-func (product *Product) UpdatedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(product.UpdatedAt(), carbon.UTC)
+func (product *Product) UpdatedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(product.UpdatedAt(), carbon.UTC)
 }
 
 func (product *Product) SetUpdatedAt(updatedAt string) ProductInterface {

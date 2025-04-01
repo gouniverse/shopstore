@@ -97,8 +97,8 @@ func (order *Order) CreatedAt() string {
 	return order.Get(COLUMN_CREATED_AT)
 }
 
-func (order *Order) CreatedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(order.CreatedAt(), carbon.UTC)
+func (order *Order) CreatedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(order.CreatedAt(), carbon.UTC)
 }
 
 func (order *Order) SetCreatedAt(createdAt string) OrderInterface {
@@ -242,8 +242,8 @@ func (order *Order) SoftDeletedAt() string {
 	return order.Get(COLUMN_SOFT_DELETED_AT)
 }
 
-func (order *Order) SoftDeletedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(order.SoftDeletedAt(), carbon.UTC)
+func (order *Order) SoftDeletedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(order.SoftDeletedAt(), carbon.UTC)
 }
 
 func (order *Order) SetSoftDeletedAt(deletedAt string) OrderInterface {
@@ -255,8 +255,8 @@ func (order *Order) UpdatedAt() string {
 	return order.Get(COLUMN_UPDATED_AT)
 }
 
-func (order *Order) UpdatedAtCarbon() carbon.Carbon {
-	return carbon.NewCarbon().Parse(order.UpdatedAt(), carbon.UTC)
+func (order *Order) UpdatedAtCarbon() *carbon.Carbon {
+	return carbon.Parse(order.UpdatedAt(), carbon.UTC)
 }
 
 func (order *Order) SetUpdatedAt(updatedAt string) OrderInterface {

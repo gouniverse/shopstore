@@ -16,7 +16,7 @@ type CategoryInterface interface {
 	// Setters and Getters
 
 	CreatedAt() string
-	CreatedAtCarbon() carbon.Carbon
+	CreatedAtCarbon() *carbon.Carbon
 	SetCreatedAt(createdAt string) CategoryInterface
 
 	Description() string
@@ -44,11 +44,11 @@ type CategoryInterface interface {
 	SetTitle(title string) CategoryInterface
 
 	SoftDeletedAt() string
-	SoftDeletedAtCarbon() carbon.Carbon
+	SoftDeletedAtCarbon() *carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) CategoryInterface
 
 	UpdatedAt() string
-	UpdatedAtCarbon() carbon.Carbon
+	UpdatedAtCarbon() *carbon.Carbon
 	SetUpdatedAt(updatedAt string) CategoryInterface
 }
 
@@ -66,14 +66,14 @@ type DiscountInterface interface {
 	SetCode(code string) DiscountInterface
 
 	CreatedAt() string
-	CreatedAtCarbon() carbon.Carbon
+	CreatedAtCarbon() *carbon.Carbon
 	SetCreatedAt(createdAt string) DiscountInterface
 
 	Description() string
 	SetDescription(description string) DiscountInterface
 
 	EndsAt() string
-	EndsAtCarbon() carbon.Carbon
+	EndsAtCarbon() *carbon.Carbon
 	SetEndsAt(endsAt string) DiscountInterface
 
 	ID() string
@@ -92,11 +92,11 @@ type DiscountInterface interface {
 	SetMetas(metas map[string]string) error
 
 	SoftDeletedAt() string
-	SoftDeletedAtCarbon() carbon.Carbon
+	SoftDeletedAtCarbon() *carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) DiscountInterface
 
 	StartsAt() string
-	StartsAtCarbon() carbon.Carbon
+	StartsAtCarbon() *carbon.Carbon
 	SetStartsAt(startsAt string) DiscountInterface
 
 	Status() string
@@ -109,7 +109,7 @@ type DiscountInterface interface {
 	SetType(type_ string) DiscountInterface
 
 	UpdatedAt() string
-	UpdatedAtCarbon() carbon.Carbon
+	UpdatedAtCarbon() *carbon.Carbon
 	SetUpdatedAt(updatedAt string) DiscountInterface
 }
 
@@ -121,7 +121,7 @@ type MediaInterface interface {
 	// Setters and Getters
 
 	CreatedAt() string
-	CreatedAtCarbon() carbon.Carbon
+	CreatedAtCarbon() *carbon.Carbon
 	SetCreatedAt(createdAt string) MediaInterface
 
 	Description() string
@@ -146,7 +146,7 @@ type MediaInterface interface {
 	SetSequence(sequence int) MediaInterface
 
 	SoftDeletedAt() string
-	SoftDeletedAtCarbon() carbon.Carbon
+	SoftDeletedAtCarbon() *carbon.Carbon
 	SetSoftDeletedAt(softDeletedAt string) MediaInterface
 
 	Status() string
@@ -162,7 +162,7 @@ type MediaInterface interface {
 	SetURL(url string) MediaInterface
 
 	UpdatedAt() string
-	UpdatedAtCarbon() carbon.Carbon
+	UpdatedAtCarbon() *carbon.Carbon
 	SetUpdatedAt(updatedAt string) MediaInterface
 }
 
@@ -188,7 +188,7 @@ type OrderInterface interface {
 
 	// Setters and Getters
 	CreatedAt() string
-	CreatedAtCarbon() carbon.Carbon
+	CreatedAtCarbon() *carbon.Carbon
 	SetCreatedAt(createdAt string) OrderInterface
 
 	CustomerID() string
@@ -217,14 +217,14 @@ type OrderInterface interface {
 	SetQuantityInt(quantity int64) OrderInterface
 
 	SoftDeletedAt() string
-	SoftDeletedAtCarbon() carbon.Carbon
+	SoftDeletedAtCarbon() *carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) OrderInterface
 
 	Status() string
 	SetStatus(status string) OrderInterface
 
 	UpdatedAt() string
-	UpdatedAtCarbon() carbon.Carbon
+	UpdatedAtCarbon() *carbon.Carbon
 	SetUpdatedAt(updatedAt string) OrderInterface
 }
 
@@ -234,7 +234,7 @@ type OrderLineItemInterface interface {
 	MarkAsNotDirty()
 
 	CreatedAt() string
-	CreatedAtCarbon() carbon.Carbon
+	CreatedAtCarbon() *carbon.Carbon
 	SetCreatedAt(createdAt string) OrderLineItemInterface
 
 	ID() string
@@ -268,7 +268,7 @@ type OrderLineItemInterface interface {
 	SetQuantityInt(quantity int64) OrderLineItemInterface
 
 	SoftDeletedAt() string
-	SoftDeletedAtCarbon() carbon.Carbon
+	SoftDeletedAtCarbon() *carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) OrderLineItemInterface
 
 	Status() string
@@ -278,7 +278,7 @@ type OrderLineItemInterface interface {
 	SetTitle(title string) OrderLineItemInterface
 
 	UpdatedAt() string
-	UpdatedAtCarbon() carbon.Carbon
+	UpdatedAtCarbon() *carbon.Carbon
 	SetUpdatedAt(updatedAt string) OrderLineItemInterface
 }
 
@@ -299,7 +299,7 @@ type ProductInterface interface {
 	// Setters and Getters
 
 	CreatedAt() string
-	CreatedAtCarbon() carbon.Carbon
+	CreatedAtCarbon() *carbon.Carbon
 	SetCreatedAt(createdAt string) ProductInterface
 
 	Description() string
@@ -329,7 +329,7 @@ type ProductInterface interface {
 	SetQuantityInt(quantity int64) ProductInterface
 
 	SoftDeletedAt() string
-	SoftDeletedAtCarbon() carbon.Carbon
+	SoftDeletedAtCarbon() *carbon.Carbon
 	SetSoftDeletedAt(deletedAt string) ProductInterface
 
 	ShortDescription() string
@@ -342,7 +342,7 @@ type ProductInterface interface {
 	SetTitle(title string) ProductInterface
 
 	UpdatedAt() string
-	UpdatedAtCarbon() carbon.Carbon
+	UpdatedAtCarbon() *carbon.Carbon
 	SetUpdatedAt(updatedAt string) ProductInterface
 }
 

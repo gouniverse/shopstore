@@ -48,7 +48,7 @@ func (o *Media) CreatedAt() string {
 	return o.Get(COLUMN_CREATED_AT)
 }
 
-func (o *Media) CreatedAtCarbon() carbon.Carbon {
+func (o *Media) CreatedAtCarbon() *carbon.Carbon {
 	return carbon.Parse(o.CreatedAt(), carbon.UTC)
 }
 
@@ -173,7 +173,7 @@ func (o *Media) SoftDeletedAt() string {
 	return o.Get(COLUMN_SOFT_DELETED_AT)
 }
 
-func (o *Media) SoftDeletedAtCarbon() carbon.Carbon {
+func (o *Media) SoftDeletedAtCarbon() *carbon.Carbon {
 	return carbon.Parse(o.SoftDeletedAt(), carbon.UTC)
 }
 
@@ -204,7 +204,7 @@ func (o *Media) UpdatedAt() string {
 	return o.Get(COLUMN_UPDATED_AT)
 }
 
-func (o *Media) UpdatedAtCarbon() carbon.Carbon {
+func (o *Media) UpdatedAtCarbon() *carbon.Carbon {
 	return carbon.Parse(o.UpdatedAt(), carbon.UTC)
 }
 
